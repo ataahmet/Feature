@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.louiscad.splitties:splitties-fragmentargs:3.0.0-alpha04@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/0b101e0bedd8d273f66be3819f266240/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/0b101e0bedd8d273f66be3819f266240/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.louiscad.splitties/splitties-fragmentargs/3.0.0-alpha04/d211c29dba944e04dc059b122118980e0b5bcf7e/splitties-fragmentargs-3.0.0-alpha04-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.louiscad.splitties:splitties-snackbar:3.0.0-alpha04@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/efde4ccf5748dc2006a21ee75f8663c9/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/efde4ccf5748dc2006a21ee75f8663c9/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.louiscad.splitties/splitties-snackbar/3.0.0-alpha04/f69cda6d46289db5e2432ccf8fb03d163f36d5cf/splitties-snackbar-3.0.0-alpha04-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

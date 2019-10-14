@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.louiscad.splitties:splitties-activities:3.0.0-alpha04@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/81dc7a910ea4d395bfc6923f343b5dfd/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/81dc7a910ea4d395bfc6923f343b5dfd/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.louiscad.splitties/splitties-activities/3.0.0-alpha04/b03b6338ff4f7998fdcf4c53f05fec74047eb7b4/splitties-activities-3.0.0-alpha04-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

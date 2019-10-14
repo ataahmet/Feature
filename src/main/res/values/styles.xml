@@ -1,0 +1,158 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="Theme.githup" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">@android:color/black</item>
+        <item name="android:colorBackground">@android:color/black</item>
+        <item name="android:statusBarColor">@android:color/black</item>
+        <item name="android:fontFamily">@font/circular</item>
+    </style>
+
+    <style name="Theme.githup.Splash" parent="Theme.githup">
+        <item name="android:windowBackground">@drawable/item_splash_theme</item>
+    </style>
+
+    <!-- Button -->
+    <style name="Widget.githup.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textStyle">bold</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@drawable/btn_text_color_selector</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:background">@drawable/btn_background_selector</item>
+    </style>
+
+    <style name="Widget.githup.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Widget.githup.Button.TextButton.Small" parent="Widget.githup.Button.TextButton">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Widget.githup.Button.TextButton.Colored" parent="Widget.githup.Button.TextButton">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!-- Text -->
+    <style name="TextAppearance.githup.Headline6" parent="TextAppearance.MaterialComponents.Headline6" />
+
+    <style name="TextAppearance.githup.Headline6.Colored" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="TextAppearance.githup.Headline7" parent="TextAppearance.githup.Headline6">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="TextAppearance.githup.Body1.Black" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="TextAppearance.githup.Body2.Black" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="TextAppearance.githup.Body3.Black" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="TextAppearance.githup.Body1" parent="TextAppearance.MaterialComponents.Body1" />
+
+    <style name="TextAppearance.githup.Body2" parent="TextAppearance.MaterialComponents.Body2" />
+
+    <style name="TextAppearance.githup.Body3" parent="TextAppearance.githup.Body2">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="Widget.githup.TextInputLayout.CardStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <item name="hintEnabled">false</item>
+    </style>
+
+    <style name="Widget.githup.TextInputLayout.CardStyle.Password" parent="Widget.githup.TextInputLayout.CardStyle">
+        <item name="passwordToggleEnabled">true</item>
+        <item name="passwordToggleTint">@color/dusty_gray</item>
+    </style>
+
+    <style name="Widget.githup.TextInputEditText.CardStyle" parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox.Dense">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColorHint">@color/dusty_gray</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="Widget.githup.CardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardCornerRadius">14dp</item>
+        <item name="cardElevation">5dp</item>
+    </style>
+
+    <style name="Widget.githup.BottomSheet" parent="@style/Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="Widget.githup.BottomSheetDialog" parent="@style/Theme.MaterialComponents.BottomSheetDialog">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:colorBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="colorPrimary">@color/yellow_sea</item>
+        <item name="android:statusBarColor">@android:color/black</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowCloseOnTouchOutside">false</item>
+        <item name="bottomSheetStyle">@style/Widget.githup.BottomSheet</item>
+    </style>
+
+
+    <style name="Widget.githup.CheckBox" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
+        <item name="android:textColor">@color/dusty_gray</item>
+        <item name="useMaterialThemeColors">true</item>
+        <item name="android:buttonTint">@color/yellow_sea</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Spinner">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <!-- ====================================== UNHANDLED ========================================== -->
+
+    <style name="NavigationMenuHeaderText" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textSize">18sp</item>
+        <item name="android:padding">3dp</item>
+        <item name="android:background">@null</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="NavigationMenuMain" parent="Widget.MaterialComponents.NavigationView">
+        <item name="android:textSize">18sp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <item name="boxStrokeColor">@android:color/black</item>
+    </style>
+
+    <style name="FullScreenDialogStyle" parent="Base.Theme.MaterialComponents.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="colorPrimary">@android:color/white</item>
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+
+
+
+</resources>

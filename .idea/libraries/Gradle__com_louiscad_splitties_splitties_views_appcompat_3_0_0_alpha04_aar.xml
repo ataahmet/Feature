@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.louiscad.splitties:splitties-views-appcompat:3.0.0-alpha04@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/3c6ef5ca4d178f640fd2ed6564cf4f65/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/3c6ef5ca4d178f640fd2ed6564cf4f65/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.louiscad.splitties/splitties-views-appcompat/3.0.0-alpha04/56b32869f424a683b1791fee9ff245a51e314fb2/splitties-views-appcompat-3.0.0-alpha04-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.patloew.rxlocation:rxlocation:1.0.5@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/d79c76e62f6c25b411fca9a124a67f53/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/d79c76e62f6c25b411fca9a124a67f53/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.patloew.rxlocation/rxlocation/1.0.5/de3e2079f6c9beaa35e5693ee2f0db5667147092/rxlocation-1.0.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

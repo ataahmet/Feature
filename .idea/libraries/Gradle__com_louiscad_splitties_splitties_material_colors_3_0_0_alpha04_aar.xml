@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.louiscad.splitties:splitties-material-colors:3.0.0-alpha04@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/cfab71d51a027fb613ebe0f86f0d62bd/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/cfab71d51a027fb613ebe0f86f0d62bd/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.louiscad.splitties/splitties-material-colors/3.0.0-alpha04/8fbf13b212c936940b3d8792c755bd46367a14e/splitties-material-colors-3.0.0-alpha04-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

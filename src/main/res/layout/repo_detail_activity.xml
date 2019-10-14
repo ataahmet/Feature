@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/repoDetailTbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            android:minHeight="?attr/actionBarSize"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark" />
+
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/repoDetailPosterIV"
+            android:layout_width="0dp"
+            android:layout_height="180dp"
+            android:layout_marginStart="@dimen/generic_extra_large_margin"
+            android:layout_marginTop="@dimen/generic_very_large_margin"
+            android:layout_marginEnd="@dimen/generic_extra_large_margin"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/repoDetailTbar"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/repoDetailTitleTV"
+            style="@style/Widget.githup.Button.TextButton.Colored"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="@dimen/generic_very_large_margin"
+            android:layout_marginTop="@dimen/generic_default_margin"
+            android:layout_marginEnd="@dimen/generic_very_large_margin"
+            android:gravity="center_horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/repoDetailPosterIV"
+            app:layout_constraintVertical_bias="0.5"
+            tools:Text="
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 6.0.
+Use '--warning-mode all' to show the individual deprecation warnings." />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/repoDetailEmailTV"
+            style="@style/Widget.githup.Button.TextButton.Colored"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="@dimen/generic_very_large_margin"
+            android:layout_marginTop="@dimen/generic_default_margin"
+            android:layout_marginEnd="@dimen/generic_very_large_margin"
+            android:gravity="center_horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/repoDetailTitleTV"
+            app:layout_constraintVertical_bias="0.5"
+            tools:Text="
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 6.0.
+Use '--warning-mode all' to show the individual deprecation warnings." />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/repoDetaiForkCountTV"
+            style="@style/Widget.githup.Button.TextButton.Colored"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="@dimen/generic_very_large_margin"
+            android:layout_marginTop="@dimen/generic_default_margin"
+            android:layout_marginEnd="@dimen/generic_very_large_margin"
+            android:gravity="center_horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/repoDetailEmailTV"
+            app:layout_constraintVertical_bias="0.5"
+            tools:Text="
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 6.0.
+Use '--warning-mode all' to show the individual deprecation warnings." />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</layout>
+

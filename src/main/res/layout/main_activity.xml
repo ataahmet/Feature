@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:fitsSystemWindows="true"
+        android:id="@+id/drawerLayout"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        tools:openDrawer="start">
+
+        <include
+            layout="@layout/app_bar_main"
+            android:id="@+id/app_bar"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent" />
+
+        <com.google.android.material.navigation.NavigationView
+            style="@style/NavigationMenuMain"
+            android:fitsSystemWindows="true"
+            android:id="@+id/navigationView"
+            android:layout_gravity="start"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content">
+
+            <LinearLayout
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:orientation="vertical">
+
+                <include layout="@layout/nav_header_main" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/navigationMenuItemList"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+
+
+        </com.google.android.material.navigation.NavigationView>
+    </androidx.drawerlayout.widget.DrawerLayout>
+</layout>
