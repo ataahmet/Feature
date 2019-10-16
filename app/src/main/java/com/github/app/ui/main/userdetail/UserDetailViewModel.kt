@@ -15,14 +15,9 @@ import javax.inject.Inject
 class UserDetailViewModel @Inject constructor(userRepoDataSourceUsace: UserRepoDataSourceUsace) :
     BaseViewModel<Action, State>() {
 
-
-
     var liveDataUserRepoList: LiveData<PagedList<SearchRepo>>
     private val compositeDisposable: CompositeDisposable = CompositeDisposable();
     private val perPage: Int = Keys.PER_PAGE
-
-    override val initialState = State(isIdle = true)
-
 
     override fun bind() {
 

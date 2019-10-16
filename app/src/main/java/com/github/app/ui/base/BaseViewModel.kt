@@ -9,9 +9,12 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 
 abstract class BaseViewModel<A : BaseAction, S : BaseState> : ViewModel() {
+
     protected val actions: PublishSubject<A> = PublishSubject.create<A>()
 
-    protected abstract val initialState: S
+    protected val initialState = State(isIdle = true)
+
+    protected val disposables: CompositeDisposable = CompositeDisposable()
 
     protected abstract fun bind()
 
@@ -42,7 +45,10 @@ abstract class BaseViewModel<A : BaseAction, S : BaseState> : ViewModel() {
         }
     }
 
-    protected val disposables: CompositeDisposable = CompositeDisposable()
+    init {
+        this.bind()
+    }
+
 
     val observableState: LiveData<S> = MediatorLiveData<S>().apply {
         addSource(state) { data ->

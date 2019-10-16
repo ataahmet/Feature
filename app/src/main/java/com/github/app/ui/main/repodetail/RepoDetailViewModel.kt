@@ -14,7 +14,6 @@ import javax.inject.Inject
 
 class RepoDetailViewModel @Inject constructor(private val repoListDataUseCase: RepoListDataUseCase) :
     BaseViewModel<Action, State>() {
-    override val initialState = State(isIdle = true)
 
      override fun bind() {
         val userDetailRequest = actions.ofType<Action.ActionUserDetail>().switchMap {

@@ -17,7 +17,6 @@ class MainViewModel @Inject constructor(
 
     }
 
-    override val initialState = State(isIdle = true)
 
     val getNavigationItemLiveData: LiveData<List<NavigationItem>> get() = _navigaitonItemsData
     private val _navigaitonItemsData = MutableLiveData<List<NavigationItem>>()

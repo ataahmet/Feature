@@ -25,7 +25,7 @@ class HomeViewModel @Inject constructor(val repoListDataUseCase: RepoListDataUse
 
     private val perPage: Int = Keys.PER_PAGE
 
-    override val initialState = State(isIdle = true)
+
 
 
     init {
