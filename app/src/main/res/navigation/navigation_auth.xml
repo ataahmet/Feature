@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_main"
+    app:startDestination="@id/authFragment">
+    <fragment
+        android:id="@+id/authFragment"
+        android:label="AuthFragment"
+        android:name="com.github.app.ui.auth.auth.AuthFragment"
+        tools:layout="@layout/auth_fragment">
+        <action
+            android:id="@+id/action_authFragment_to_signInFragment"
+            app:destination="@id/signInFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_authFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/signInFragment"
+        android:label="SignInFragment"
+        android:name="com.github.app.ui.auth.signin.SignInFragment"
+        tools:layout="@layout/sign_in_fragment">
+        <action
+            android:id="@+id/action_signInFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@+id/signUpFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_signInFragment_to_forgotPasswordFragment"
+            app:destination="@id/forgotPasswordFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:label="SignUpFragment"
+        android:name="com.github.app.ui.auth.signup.SignUpFragment"
+        tools:layout="@layout/sign_up_fragment">
+        <action
+            android:id="@+id/action_signUpFragment_to_signInFragment"
+            app:destination="@id/signInFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@id/signInFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_signUpFragment_to_createPasswordFragment"
+            app:destination="@id/createPasswordFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/forgotPasswordFragment"
+        android:label="ForgotPasswordFragment"
+        android:name="com.github.app.ui.auth.forgotpassword.ForgotPasswordFragment"
+        tools:layout="@layout/forgot_password_fragment" />
+    <fragment
+        android:id="@+id/createPasswordFragment"
+        android:label="CreatePasswordFragment"
+        android:name="com.github.app.ui.auth.createpassword.CreatePasswordFragment"
+        tools:layout="@layout/create_password_fragment" />
+</navigation>

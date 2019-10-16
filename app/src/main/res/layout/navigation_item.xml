@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:theme="@style/Theme.MaterialComponents.DayNight"
+        android:orientation="horizontal">
+        <androidx.appcompat.widget.AppCompatTextView
+            android:gravity="left"
+            android:id="@+id/navMenuItemTv"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:padding="16dp"
+            android:text="sdfsdfsdf"
+            android:textColor="@android:color/black"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+
+</layout>

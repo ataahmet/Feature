@@ -1,11 +1,11 @@
 <component name="libraryTable">
   <library name="Gradle: com.yarolegovich:discrete-scrollview:1.4.9@aar">
     <ANNOTATIONS>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/a4f8785651477d7d18ca95d0b138a72d/annotations.zip!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/f72dc325449258ac28165f3a8e316fa3/jetified-discrete-scrollview-1.4.9/annotations.zip!/" />
     </ANNOTATIONS>
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/a4f8785651477d7d18ca95d0b138a72d/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/a4f8785651477d7d18ca95d0b138a72d/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/f72dc325449258ac28165f3a8e316fa3/jetified-discrete-scrollview-1.4.9/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/f72dc325449258ac28165f3a8e316fa3/jetified-discrete-scrollview-1.4.9/res" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.yarolegovich/discrete-scrollview/1.4.9/e2b1b87b163d37a18be763fd46d8c2b241ade8e9/discrete-scrollview-1.4.9-javadoc.jar!/" />

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:gravity="bottom"
+    android:layout_height="@dimen/nav_header_height"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:theme="@style/Theme.MaterialComponents.DayNight">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_height="match_parent"
+        android:elevation="8dp"
+        android:id="@+id/ivUserProfile"
+        android:layout_gravity="start"
+        android:background="@mipmap/github_logo"
+        android:layout_width="150dp" />
+</LinearLayout>
