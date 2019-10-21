@@ -1,5 +1,4 @@
-# githup-app-android
- MVI Sample 1 
+MVI architecture
 
 
 
