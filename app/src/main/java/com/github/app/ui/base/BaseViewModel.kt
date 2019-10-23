@@ -6,11 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.app.reduce.*
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.ReplaySubject
 
 abstract class BaseViewModel<A : BaseAction, S : BaseState> : ViewModel() {
 
-    protected val actions: PublishSubject<A> = PublishSubject.create<A>()
+    protected val actions: ReplaySubject<A> = ReplaySubject.create<A>()
 
     protected val initialState = State(isIdle = true)
 

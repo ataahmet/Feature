@@ -7,11 +7,9 @@ import com.github.app.domain.entity.SearchRepo
 import com.github.app.domain.usecase.RepoListDataUseCase
 import com.github.app.reduce.Action
 import com.github.app.reduce.Change
-import com.github.app.reduce.Reducer
 import com.github.app.reduce.State
 import com.github.app.ui.base.BaseViewModel
 import com.github.app.util.Keys
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.ofType
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.schedulers.Schedulers
