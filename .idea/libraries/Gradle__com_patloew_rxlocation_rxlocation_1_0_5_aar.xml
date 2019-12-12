@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.patloew.rxlocation:rxlocation:1.0.5@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/177f74f00afce33d3bc28120260f8ee8/jetified-rxlocation-1.0.5/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/177f74f00afce33d3bc28120260f8ee8/jetified-rxlocation-1.0.5/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/3e895dab4e15feb0beb0eed8006c17f3/jetified-rxlocation-1.0.5/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/3e895dab4e15feb0beb0eed8006c17f3/jetified-rxlocation-1.0.5/res" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.patloew.rxlocation/rxlocation/1.0.5/c097ab00a9fe388e7b309313c391a01c16941eeb/rxlocation-1.0.5-javadoc.jar!/" />

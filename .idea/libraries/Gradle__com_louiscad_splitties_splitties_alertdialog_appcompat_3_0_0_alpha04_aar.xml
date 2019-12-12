@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.louiscad.splitties:splitties-alertdialog-appcompat:3.0.0-alpha04@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/dcb7a32b6625d8f2150f7c91fa0163c1/splitties-alertdialog-appcompat-3.0.0-alpha04/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/dcb7a32b6625d8f2150f7c91fa0163c1/splitties-alertdialog-appcompat-3.0.0-alpha04/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/dd02d318f18e336dbc46ca8d6a21e376/jetified-splitties-alertdialog-appcompat-3.0.0-alpha04/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/dd02d318f18e336dbc46ca8d6a21e376/jetified-splitties-alertdialog-appcompat-3.0.0-alpha04/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
