@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.louiscad.splitties:splitties-views:3.0.0-alpha04@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/acd2fb6b8800b00d4fbc97ea3e771e46/jetified-splitties-views-3.0.0-alpha04/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/acd2fb6b8800b00d4fbc97ea3e771e46/jetified-splitties-views-3.0.0-alpha04/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/1b71a6ab83cd83bef106dc93b52bd8d1/jetified-splitties-views-3.0.0-alpha04/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/1b71a6ab83cd83bef106dc93b52bd8d1/jetified-splitties-views-3.0.0-alpha04/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

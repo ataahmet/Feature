@@ -1,11 +1,11 @@
 <component name="libraryTable">
   <library name="Gradle: androidx.ui:ui-android-text:0.1.0-dev02@aar">
     <ANNOTATIONS>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/4635de5162ba31e6aa3305a7aae5c60f/jetified-ui-android-text-0.1.0-dev02/annotations.zip!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/cc015777556b9e0b6d357fa7a696a847/jetified-ui-android-text-0.1.0-dev02/annotations.zip!/" />
     </ANNOTATIONS>
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/4635de5162ba31e6aa3305a7aae5c60f/jetified-ui-android-text-0.1.0-dev02/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/4635de5162ba31e6aa3305a7aae5c60f/jetified-ui-android-text-0.1.0-dev02/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/cc015777556b9e0b6d357fa7a696a847/jetified-ui-android-text-0.1.0-dev02/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/cc015777556b9e0b6d357fa7a696a847/jetified-ui-android-text-0.1.0-dev02/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

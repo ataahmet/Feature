@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: androidx.activity:activity:1.1.0-rc03@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/af67a9e82b78b29b99043671fbd151f3/jetified-activity-1.1.0-rc03/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/af67a9e82b78b29b99043671fbd151f3/jetified-activity-1.1.0-rc03/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/ceece504a57fe1f5f773b793b3b0b348/jetified-activity-1.1.0-rc03/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/ceece504a57fe1f5f773b793b3b0b348/jetified-activity-1.1.0-rc03/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

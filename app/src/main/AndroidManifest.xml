@@ -7,33 +7,31 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
+        android:name="com.github.app.app.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name="com.github.app.app.App"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.githup"
         tools:ignore="GoogleAppIndexingWarning">
-
         <activity
             android:name="com.github.app.ui.main.MainActivity"
+            android:configChanges="orientation" />
+        <activity
+            android:name="com.github.app.ui.main.userdetail.UserDetailActivity"
+            android:configChanges="orientation" />
+        <activity
+            android:name=".ui.main.repodetail.RepoDetailActivity"
+            android:configChanges="orientation" />
+        <activity
+            android:name=".ui.main.splash.SplashActivity"
             android:configChanges="orientation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-
-        <activity
-            android:name="com.github.app.ui.main.userdetail.UserDetailActivity"
-            android:configChanges="orientation"/>
-
-
-        <activity
-            android:name=".ui.main.repodetail.RepoDetailActivity"
-            android:configChanges="orientation" />
 
     </application>
 

@@ -3,7 +3,6 @@ package com.github.app.ui.main.repodetail
 import com.github.app.domain.usecase.RepoListDataUseCase
 import com.github.app.reduce.Action
 import com.github.app.reduce.Change
-import com.github.app.reduce.Reducer
 import com.github.app.reduce.State
 import com.github.app.ui.base.BaseViewModel
 import io.reactivex.rxkotlin.ofType

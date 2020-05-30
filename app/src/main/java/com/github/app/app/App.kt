@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class App : DaggerApplication() {
     @Inject
-    lateinit var appInitializers: Set<@JvmSuppressWildcards AppInitializer>
+    lateinit var appInitializer: Set<@JvmSuppressWildcards AppInitializer>
 
     override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
         return DaggerAppComponent.builder().create(this)
@@ -15,6 +15,6 @@ class App : DaggerApplication() {
 
     override fun onCreate() {
         super.onCreate()
-        appInitializers.forEach { it.init(this) }
+        appInitializer.forEach { it.init(this) }
     }
 }
