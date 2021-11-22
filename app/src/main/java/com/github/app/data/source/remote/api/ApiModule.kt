@@ -3,10 +3,13 @@ package com.github.app.data.source.remote.api
 import android.app.Application
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.github.app.BuildConfig
+import com.github.app.data.source.remote.api.entity.ApiPaths
 import com.serjltt.moshi.adapters.Wrapped
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import io.paperdb.Book
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -19,13 +22,14 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
+@InstallIn(SingletonComponent::class)
 @Module
-class ApiModule {
+object ApiModule {
 
     @Singleton
     @Provides
     fun provideCache(application: Application) =
-        Cache(File(application.cacheDir, "retrofit-cache"), CACHE_SIZE_IN_BYTES)
+        Cache(File(application.cacheDir, "retrofit-cache"), ApiPaths.CACHE_SIZE_IN_BYTES)
 
     @Singleton
     @Provides
@@ -55,9 +59,9 @@ class ApiModule {
         .addInterceptor(requestInterceptor)
         .addInterceptor(httpLoggingInterceptor)
         .addNetworkInterceptor(StethoInterceptor())
-        .connectTimeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
-        .readTimeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
-        .writeTimeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
+        .connectTimeout(ApiPaths.TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
+        .readTimeout(ApiPaths.TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
+        .writeTimeout(ApiPaths.TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
         .build()
 
     @Singleton
@@ -71,7 +75,7 @@ class ApiModule {
     @Provides
     fun provideRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit =
         Retrofit.Builder()
-            .baseUrl(API_BASE_URL)
+            .baseUrl(ApiPaths.API_BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .client(okHttpClient)
@@ -79,15 +83,7 @@ class ApiModule {
 
     @Singleton
     @Provides
-    fun provideTicketWalletdApi(retrofit: Retrofit): GithubApi = retrofit.create(
+    fun provideGithubApi(retrofit: Retrofit): GithubApi = retrofit.create(
         GithubApi::class.java
     )
-
-    companion object ApiPaths {
-        private const val TIMEOUT_IN_SECONDS: Long = 30
-        private const val CACHE_SIZE_IN_BYTES: Long = 10 * 1024 * 1024
-
-        private const val API_HOST = "api.github.com"
-        private const val API_BASE_URL = "https://$API_HOST/"
-    }
 }

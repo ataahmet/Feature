@@ -5,12 +5,14 @@ import com.github.app.reduce.Action
 import com.github.app.reduce.Change
 import com.github.app.reduce.State
 import com.github.app.ui.base.BaseViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxkotlin.ofType
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
+@HiltViewModel
 class RepoDetailViewModel @Inject constructor(private val repoListDataUseCase: RepoListDataUseCase) :
     BaseViewModel<Action, State>() {
 

@@ -1,20 +1,39 @@
 package com.github.app.app
 
+import android.app.Application
 import com.github.app.app.initializer.AppInitializer
-import dagger.android.AndroidInjector
-import dagger.android.support.DaggerApplication
+import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
+import javax.inject.Qualifier
 
-class App : DaggerApplication() {
+@HiltAndroidApp
+class App : Application() {
+
+    @Stetho
     @Inject
-    lateinit var appInitializer: Set<@JvmSuppressWildcards AppInitializer>
+    lateinit var stetho: AppInitializer
 
-    override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
-        return DaggerAppComponent.builder().create(this)
-    }
+    @Paper
+    @Inject
+    lateinit var paper: AppInitializer
+
+    @AndroidThreeTen
+    @Inject
+    lateinit var threeTen: AppInitializer
 
     override fun onCreate() {
         super.onCreate()
-        appInitializer.forEach { it.init(this) }
+        stetho.init(this)
+        paper.init(this)
+        threeTen.init(this)
     }
 }
+
+@Qualifier
+annotation class AndroidThreeTen
+
+@Qualifier
+annotation class Paper
+
+@Qualifier
+annotation class Stetho

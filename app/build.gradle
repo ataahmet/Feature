@@ -2,9 +2,10 @@ import java.text.SimpleDateFormat
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs"
+apply plugin: 'dagger.hilt.android.plugin'
 
 def versionMajor = 0
 def versionMinor = 0
@@ -28,9 +29,13 @@ android {
         vectorDrawables.useSupportLibrary = true
         buildConfigField "String", "GIT_SHA", "\"${gitSha()}\""
         buildConfigField "String", "BUILD_TIME", "\"${buildTime()}\""
-    }
-    androidExtensions {
-        experimental = true
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments["room.incremental"] = "true"
+                arguments["dagger.hilt.disableModulesHaveInstallInCheck"] = "true"
+            }
+        }
     }
 
     buildTypes {
@@ -112,16 +117,22 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-moshi:2.5.0"
 
     // Moshi
-    implementation "com.squareup.moshi:moshi:1.8.0"
-    kapt "com.squareup.moshi:moshi-kotlin-codegen:1.8.0"
+    implementation "com.squareup.moshi:moshi:1.12.0"
+    kapt "com.squareup.moshi:moshi-kotlin-codegen:1.12.0"
     implementation 'com.serjltt.moshi:moshi-lazy-adapters:2.2'
 
-    // Dagger
-    implementation 'com.google.dagger:dagger:2.22.1'
-    kapt 'com.google.dagger:dagger-compiler:2.22.1'
-    implementation 'com.google.dagger:dagger-android:2.22.1'
-    implementation 'com.google.dagger:dagger-android-support:2.22.1'
-    kapt 'com.google.dagger:dagger-android-processor:2.22.1'
+    // Dagger Core
+    implementation "com.google.dagger:dagger:2.37"
+    kapt "com.google.dagger:dagger-compiler:2.37"
+
+    // Dagger Android
+    api 'com.google.dagger:dagger-android:2.37'
+    api 'com.google.dagger:dagger-android-support:2.37'
+    kapt 'com.google.dagger:dagger-android-processor:2.37'
+
+    // Dagger - Hilt
+    implementation "com.google.dagger:hilt-android:2.37"
+    kapt "com.google.dagger:hilt-android-compiler:2.37"
 
     // RxJava
     implementation 'io.reactivex.rxjava2:rxjava:2.2.8'

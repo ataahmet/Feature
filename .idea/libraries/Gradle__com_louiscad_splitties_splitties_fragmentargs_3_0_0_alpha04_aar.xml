@@ -1,8 +1,10 @@
 <component name="libraryTable">
   <library name="Gradle: com.louiscad.splitties:splitties-fragmentargs:3.0.0-alpha04@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/6f5a3a293404f4023ba9aee5bf4b45c7/jetified-splitties-fragmentargs-3.0.0-alpha04/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/6f5a3a293404f4023ba9aee5bf4b45c7/jetified-splitties-fragmentargs-3.0.0-alpha04/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/7a92d542c978a7df8d860cc1ebd03d36/transformed/jetified-splitties-fragmentargs-3.0.0-alpha04/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/012075f58b2455ffe14ecd87940dcd43/transformed/jetified-splitties-fragmentargs-3.0.0-alpha04/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/012075f58b2455ffe14ecd87940dcd43/transformed/jetified-splitties-fragmentargs-3.0.0-alpha04/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/012075f58b2455ffe14ecd87940dcd43/transformed/jetified-splitties-fragmentargs-3.0.0-alpha04/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

@@ -7,18 +7,18 @@ import com.github.app.domain.usecase.getItemsNavigation.ProdGetNavigationItemUse
 import com.github.app.reduce.Action
 import com.github.app.reduce.State
 import com.github.app.ui.base.BaseViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
+@HiltViewModel
 class MainViewModel @Inject constructor(
     prodGetNavigationItemUseCase: ProdGetNavigationItemUseCase
 ) : BaseViewModel<Action, State>() {
 
-    override fun bind() {
-
-    }
-
+    override fun bind() {}
 
     val getNavigationItemLiveData: LiveData<List<NavigationItem>> get() = _navigaitonItemsData
+
     private val _navigaitonItemsData = MutableLiveData<List<NavigationItem>>()
 
     init {

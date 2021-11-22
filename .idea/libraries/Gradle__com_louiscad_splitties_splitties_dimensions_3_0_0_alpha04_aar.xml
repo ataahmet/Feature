@@ -1,8 +1,10 @@
 <component name="libraryTable">
   <library name="Gradle: com.louiscad.splitties:splitties-dimensions:3.0.0-alpha04@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/d54b2006831f50621ae2cca257012089/jetified-splitties-dimensions-3.0.0-alpha04/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/d54b2006831f50621ae2cca257012089/jetified-splitties-dimensions-3.0.0-alpha04/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/dd5b9ee01c1777c080ca587945de272f/transformed/jetified-splitties-dimensions-3.0.0-alpha04/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/604217ff0294d55535cecfad9d691d5f/transformed/jetified-splitties-dimensions-3.0.0-alpha04/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/604217ff0294d55535cecfad9d691d5f/transformed/jetified-splitties-dimensions-3.0.0-alpha04/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/604217ff0294d55535cecfad9d691d5f/transformed/jetified-splitties-dimensions-3.0.0-alpha04/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

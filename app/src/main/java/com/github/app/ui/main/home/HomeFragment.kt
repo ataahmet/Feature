@@ -4,6 +4,8 @@ package com.github.app.ui.main.home
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.viewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.app.R
@@ -13,18 +15,24 @@ import com.github.app.domain.entity.SearchRepo
 import com.github.app.reduce.Action
 import com.github.app.ui.base.BaseFragment
 import com.github.app.ui.main.repodetail.RepoDetailActivity
+import com.github.app.ui.main.repodetail.RepoDetailViewModel
 import com.github.app.ui.main.userdetail.UserDetailActivity
 import com.github.app.util.Keys.AVATAR_EMAIL
 import com.github.app.util.Keys.AVATAR_NAME
 import com.github.app.util.Keys.AVATAR_REPO
 import com.github.app.util.Keys.AVATAR_URL
+import dagger.hilt.android.AndroidEntryPoint
 import splitties.activities.start
 import timber.log.Timber
 
+@AndroidEntryPoint
 class HomeFragment : BaseFragment<HomeViewModel, HomeFragmentBinding>() {
 
+    private val generateVM: HomeViewModel by viewModels()
+
     override val layoutRes = R.layout.home_fragment
-    override val viewModelClass = HomeViewModel::class.java
+
+    override fun provideViewModel() = generateVM
 
     private val searchRepoListAdapter: SearchRepoListAdapter by lazy {
         SearchRepoListAdapter().apply {
@@ -64,7 +72,6 @@ class HomeFragment : BaseFragment<HomeViewModel, HomeFragmentBinding>() {
                             isLoaded -> gotoUserDetail(it.data)
                         }
                     }
-
                 })
             }
         }

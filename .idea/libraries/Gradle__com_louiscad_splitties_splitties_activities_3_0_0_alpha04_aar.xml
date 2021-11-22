@@ -1,8 +1,10 @@
 <component name="libraryTable">
   <library name="Gradle: com.louiscad.splitties:splitties-activities:3.0.0-alpha04@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/dd6c68c7630dc531932b9cf9b2b12d68/jetified-splitties-activities-3.0.0-alpha04/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/dd6c68c7630dc531932b9cf9b2b12d68/jetified-splitties-activities-3.0.0-alpha04/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/2e186da0556af4cd04e7dc242d2b8fec/transformed/jetified-splitties-activities-3.0.0-alpha04/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/fe0950cef99357f658625507f182fc1a/transformed/jetified-splitties-activities-3.0.0-alpha04/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/fe0950cef99357f658625507f182fc1a/transformed/jetified-splitties-activities-3.0.0-alpha04/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/fe0950cef99357f658625507f182fc1a/transformed/jetified-splitties-activities-3.0.0-alpha04/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

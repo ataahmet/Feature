@@ -1,8 +1,10 @@
 <component name="libraryTable">
   <library name="Gradle: com.louiscad.splitties:splitties-views-appcompat:3.0.0-alpha04@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/d1ac3f0e04c13dcf48d5efadebea8e7e/jetified-splitties-views-appcompat-3.0.0-alpha04/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/d1ac3f0e04c13dcf48d5efadebea8e7e/jetified-splitties-views-appcompat-3.0.0-alpha04/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/421a639a947d5b72c2efc1ee35a7f304/transformed/jetified-splitties-views-appcompat-3.0.0-alpha04/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/c429451af21bf4c5f4620e7111f1a073/transformed/jetified-splitties-views-appcompat-3.0.0-alpha04/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/c429451af21bf4c5f4620e7111f1a073/transformed/jetified-splitties-views-appcompat-3.0.0-alpha04/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/c429451af21bf4c5f4620e7111f1a073/transformed/jetified-splitties-views-appcompat-3.0.0-alpha04/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

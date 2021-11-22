@@ -1,8 +1,10 @@
 <component name="libraryTable">
   <library name="Gradle: com.louiscad.splitties:splitties-snackbar:3.0.0-alpha04@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/f404c096ce8b9baee4c24044ed61df3b/jetified-splitties-snackbar-3.0.0-alpha04/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/f404c096ce8b9baee4c24044ed61df3b/jetified-splitties-snackbar-3.0.0-alpha04/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/43e809eb5e5e57db21b198ea6304b784/transformed/jetified-splitties-snackbar-3.0.0-alpha04/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/2a7b13b66570057dfa5e84ddb4a125f5/transformed/jetified-splitties-snackbar-3.0.0-alpha04/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/2a7b13b66570057dfa5e84ddb4a125f5/transformed/jetified-splitties-snackbar-3.0.0-alpha04/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/2a7b13b66570057dfa5e84ddb4a125f5/transformed/jetified-splitties-snackbar-3.0.0-alpha04/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

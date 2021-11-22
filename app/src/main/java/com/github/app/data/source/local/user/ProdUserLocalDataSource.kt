@@ -4,7 +4,9 @@ import com.github.app.util.Keys
 import io.paperdb.Book
 import io.reactivex.Single
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class ProdUserLocalDataSource @Inject constructor(
     private val defaultBook: Book
 ) : UserLocalDataSource {

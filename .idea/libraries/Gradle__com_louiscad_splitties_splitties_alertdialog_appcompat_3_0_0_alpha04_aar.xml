@@ -1,8 +1,10 @@
 <component name="libraryTable">
   <library name="Gradle: com.louiscad.splitties:splitties-alertdialog-appcompat:3.0.0-alpha04@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/3963f988036b75cc6bf46acc367875fc/jetified-splitties-alertdialog-appcompat-3.0.0-alpha04/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/3963f988036b75cc6bf46acc367875fc/jetified-splitties-alertdialog-appcompat-3.0.0-alpha04/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/04192823ce1ba451239012de4aafd845/transformed/jetified-splitties-alertdialog-appcompat-3.0.0-alpha04/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/5ccfdc7d295039375144428bd8f28c9c/transformed/jetified-splitties-alertdialog-appcompat-3.0.0-alpha04/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/5ccfdc7d295039375144428bd8f28c9c/transformed/jetified-splitties-alertdialog-appcompat-3.0.0-alpha04/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/5ccfdc7d295039375144428bd8f28c9c/transformed/jetified-splitties-alertdialog-appcompat-3.0.0-alpha04/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

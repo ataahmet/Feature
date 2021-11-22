@@ -32,6 +32,6 @@ abstract class BaseViewHolder<D, out B : ViewDataBinding>(protected val binding:
 
 class DiffCallback<D> : DiffUtil.ItemCallback<D>() {
     override fun areItemsTheSame(oldItem: D, newItem: D) = true
-    override fun areContentsTheSame(oldItem: D, newItem: D) = oldItem == newItem
+    override fun areContentsTheSame(oldItem: D, newItem: D) = true
 }
 

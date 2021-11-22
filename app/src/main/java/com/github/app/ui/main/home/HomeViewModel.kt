@@ -10,20 +10,20 @@ import com.github.app.reduce.Change
 import com.github.app.reduce.State
 import com.github.app.ui.base.BaseViewModel
 import com.github.app.util.Keys
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxkotlin.ofType
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
+@HiltViewModel
 class HomeViewModel @Inject constructor(val repoListDataUseCase: RepoListDataUseCase) :
     BaseViewModel<Action, State>() {
 
     var liveDataSearchRepoList: LiveData<PagedList<SearchRepo>>
 
     private val perPage: Int = Keys.PER_PAGE
-
-
 
 
     init {

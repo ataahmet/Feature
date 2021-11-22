@@ -1,6 +1,7 @@
 package com.github.app.ui.main.userdetail
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.app.R
@@ -8,16 +9,21 @@ import com.github.app.databinding.UserDetailActivityBinding
 import com.github.app.extension.loadUrl
 import com.github.app.ui.base.BaseViewActivity
 import com.github.app.ui.main.home.SearchRepoListAdapter
+import com.github.app.ui.main.repodetail.RepoDetailViewModel
 import com.github.app.util.Keys.AVATAR_EMAIL
 import com.github.app.util.Keys.AVATAR_NAME
 import com.github.app.util.Keys.AVATAR_URL
+import dagger.hilt.android.AndroidEntryPoint
 import splitties.views.onClick
 
+@AndroidEntryPoint
 class UserDetailActivity : BaseViewActivity<UserDetailViewModel, UserDetailActivityBinding>() {
 
     override val layoutRes = R.layout.user_detail_activity
 
-    override val viewModelClass = UserDetailViewModel::class.java
+    private val generateVM: UserDetailViewModel by viewModels()
+
+    override fun provideViewModel() = generateVM
 
     private val userDetailRepoListAdapter: SearchRepoListAdapter by lazy {
         SearchRepoListAdapter().apply {

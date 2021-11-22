@@ -1,6 +1,7 @@
 package com.github.app.ui.main.repodetail
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import com.github.app.R
 import com.github.app.databinding.RepoDetailActivityBinding
@@ -11,13 +12,19 @@ import com.github.app.reduce.Action
 import com.github.app.ui.base.BaseViewActivity
 import com.github.app.ui.main.userdetail.UserDetailActivity
 import com.github.app.util.Keys
+import dagger.hilt.android.AndroidEntryPoint
 import splitties.activities.start
 import splitties.views.onClick
 import timber.log.Timber
 
+@AndroidEntryPoint
 class RepoDetailActivity : BaseViewActivity<RepoDetailViewModel, RepoDetailActivityBinding>() {
+
+    private val generateVM: RepoDetailViewModel by viewModels()
+
+    override fun provideViewModel() = generateVM
+
     override val layoutRes = R.layout.repo_detail_activity
-    override val viewModelClass = RepoDetailViewModel::class.java
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,10 +35,10 @@ class RepoDetailActivity : BaseViewActivity<RepoDetailViewModel, RepoDetailActiv
         viewModel.apply {
             with(binding) {
                 val repo = intent.getParcelableExtra<SearchRepo>(Keys.AVATAR_REPO)
-                repo.owner?.ownerImageUrl?.let { repoDetailPosterIV.loadUrl(it) }
-                repoDetailTitleTV.text = "Repo Name : " + repo.repoName
-                repoDetailEmailTV.text = "Owner Email : " + repo.owner?.email
-                repoDetaiForkCountTV.text = "Fork Count : " + repo.forks.toString()
+                repo?.owner?.ownerImageUrl?.let { repoDetailPosterIV.loadUrl(it) }
+                repoDetailTitleTV.text = "Repo Name : " + repo?.repoName
+                repoDetailEmailTV.text = "Owner Email : " + repo?.owner?.email
+                repoDetaiForkCountTV.text = "Fork Count : " + repo?.forks.toString()
 
                 observableState.observe(this@RepoDetailActivity, Observer {
                     with(it) {
@@ -44,7 +51,8 @@ class RepoDetailActivity : BaseViewActivity<RepoDetailViewModel, RepoDetailActiv
 
                 })
                 repoDetailPosterIV.onClick {
-                    repo.owner?.ownerName?.let { Action.ActionUserDetail(it) }?.let { dispatch(it) }
+                    repo?.owner?.ownerName?.let { Action.ActionUserDetail(it) }
+                        ?.let { dispatch(it) }
                 }
             }
         }

@@ -6,5 +6,4 @@ import javax.inject.Inject
 
 class ProdSearchRepository @Inject constructor(private val githubApi: GithubApi) :
     SearchRepository {
-
 }
