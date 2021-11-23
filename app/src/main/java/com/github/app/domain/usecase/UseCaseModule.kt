@@ -5,11 +5,11 @@ import com.github.app.domain.usecase.repolist.RepoListUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import dagger.hilt.android.components.ViewModelComponent
 import javax.inject.Singleton
 
-@InstallIn(SingletonComponent::class)
 @Module
+@InstallIn(ViewModelComponent::class)
 abstract class UseCaseModule {
 
     @Singleton

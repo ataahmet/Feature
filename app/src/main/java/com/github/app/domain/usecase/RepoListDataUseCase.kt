@@ -7,10 +7,12 @@ import com.github.app.data.source.remote.api.GithubApi
 import com.github.app.domain.entity.Owner
 import com.github.app.domain.entity.SearchRepo
 import com.github.app.domain.repository.UserRepository
+import dagger.hilt.android.scopes.ViewModelScoped
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
+@ViewModelScoped
 class RepoListDataUseCase @Inject constructor(
     private var githubApi: GithubApi,
     private var userRepository: UserRepository

@@ -9,9 +9,11 @@ import com.github.app.reduce.Action
 import com.github.app.reduce.State
 import com.github.app.ui.base.BaseViewModel
 import com.github.app.util.Keys
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
+@HiltViewModel
 class UserDetailViewModel @Inject constructor(userRepoDataSourceUsace: UserRepoDataSourceUsace) :
     BaseViewModel<Action, State>() {
 
