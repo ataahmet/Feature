@@ -19,6 +19,6 @@ class ProdUserLocalDataSource @Inject constructor(
     }
 
     override fun getUserName(): String {
-        return defaultBook.read(Keys.USERNAME)
+        return defaultBook.read<String>(Keys.USERNAME)?:""
     }
 }

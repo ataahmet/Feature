@@ -35,7 +35,7 @@ object ApiModule {
     @Provides
     fun provideRequestInterceptor(defaultBook: Book) = Interceptor { chain ->
         val originalRequest = chain.request()
-        val url = originalRequest.url().newBuilder()
+        val url = originalRequest.url.newBuilder()
             .build()
         val request = originalRequest.newBuilder().url(url).build()
         chain.proceed(request)

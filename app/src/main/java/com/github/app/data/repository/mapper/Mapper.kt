@@ -7,7 +7,7 @@ import com.github.app.domain.entity.Owner
 import com.github.app.domain.entity.SearchRepo
 
 fun SearchRepoItem.mapToSearchListEntity() = `items`?.map {
-    it?.mapToSearchRepoEntity()
+    it?.mapToSearchRepoEntity()?:SearchRepo(0,"",null,0)
 } ?: mutableListOf()
 
 fun SearchRepoItem.RepoItem.mapToSearchRepoEntity() = SearchRepo(
