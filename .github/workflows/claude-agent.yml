@@ -49,7 +49,13 @@ jobs:
           PROMPT="Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} inceliyorsun.
           Değişen dosyalar: ${SAFE_FILES}
           Kod: ${DIFF_CONTENT}
-          Bug, null safety, performans sorunlarını Türkçe maddeler halinde yorum yap."
+          
+          Şunları incele ve Türkçe maddeler halinde yorum yap:
+          - Null safety ihlalleri
+          - Crash riski taşıyan satırlar
+          - Performans sorunları
+          - Kotlin best practice ihlalleri
+          - Edge case'ler"
 
           echo "$PROMPT" | claude -p - | gh pr comment "$PR_NUMBER" --body-file -
 
@@ -67,25 +73,43 @@ jobs:
 
           for FILE in $CHANGED_FILES; do
             if [ -f "$FILE" ]; then
-              claude -p "Sen bir Android Kotlin uzmanısın.
-              Bu dosyadaki bug, null safety ihlali ve crash risklerini düzelt.
-              Sadece kodu döndür, markdown veya açıklama ekleme.
-          
-              Dosya: $FILE
-              $(cat "$FILE")" > "${FILE}.fixed"
 
-              if ! diff -q "$FILE" "${FILE}.fixed" > /dev/null 2>&1; then
+              # 1. Claude'a sıkı prompt gönder
+              claude -p "Sen bir Android Kotlin uzmanısın.
+              Aşağıdaki dosyadaki hataları düzelt.
+
+              ÇIKTI KURALLARI (ZORUNLU):
+              - SADECE Kotlin kodu yaz
+              - İlk karakter package veya import olmalı
+              - Hiçbir açıklama, markdown, \`\`\` işareti YAZMA
+              - Dosyanın tamamını yaz, eksik bırakma
+
+              $(cat "$FILE")" > "${FILE}.raw"
+
+              # 2. Markdown artıklarını temizle
+              sed '/^```/d' "${FILE}.raw" > "${FILE}.step1"
+
+              # 3. İlk geçerli Kotlin satırından itibaren al
+              sed -n '/^\(package\|import\|\/\*\|\/\/\|@\|class\|fun\|object\|interface\|enum\|sealed\|data\)/,$p' \
+                "${FILE}.step1" > "${FILE}.fixed"
+
+              # 4. Değişiklik olduysa uygula
+              if [ -s "${FILE}.fixed" ] && ! diff -q "$FILE" "${FILE}.fixed" > /dev/null 2>&1; then
                 mv "${FILE}.fixed" "$FILE"
+                echo "✅ Fixed: $FILE"
               else
-                rm "${FILE}.fixed"
+                echo "⏭️ No changes: $FILE"
               fi
+
+              # 5. Temp dosyaları temizle
+              rm -f "${FILE}.raw" "${FILE}.step1" "${FILE}.fixed"
             fi
           done
 
           git add -A
 
           if git diff --staged --quiet; then
-            echo "No fixes needed."
+            echo "No fixes to commit."
             exit 0
           fi
 
@@ -104,10 +128,10 @@ jobs:
 
           if [ -n "$FIXED_FILES" ]; then
             COMMENT="🤖 **Claude otomatik düzeltme yaptı:**
-          
-            $(echo "$FIXED_FILES" | sed 's/^/- /')
-          
-            Lütfen değişiklikleri review edin."
+
+          $(echo "$FIXED_FILES" | sed 's/^/- /')
+
+          Lütfen değişiklikleri review edin."
             echo "$COMMENT" | gh pr comment "$PR_NUMBER" --body-file -
           fi
 
@@ -124,10 +148,11 @@ jobs:
           BASE_BRANCH=$(gh pr view "$PR_NUMBER" --json baseRefName -q .baseRefName)
           SAFE_BASE=$(echo "$BASE_BRANCH" | tr -cd '[:alnum:]/_.-')
           git fetch origin "$SAFE_BASE"
+
           DIFF_CONTENT=$(git diff origin/"$SAFE_BASE"...HEAD -- *.kt *.java 2>/dev/null | head -c 8000)
 
-          PROMPT="PR #${PR_NUMBER} için review isteği.
+          PROMPT="Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} için manuel review isteği geldi.
           Kod: ${DIFF_CONTENT}
-          Detaylı Türkçe inceleme yap."
+          Detaylı Türkçe kod incelemesi yap."
 
           echo "$PROMPT" | claude -p - | gh pr comment "$PR_NUMBER" --body-file -
