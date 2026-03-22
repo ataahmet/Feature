@@ -31,24 +31,27 @@ class RepoDetailActivity : BaseViewActivity<RepoDetailViewModel, RepoDetailActiv
         initializeViewModel()
     }
 
+    fun getUsername(user: String?): String {
+        return user?.length?.toString() ?: ""
+    }
+
     private fun initializeViewModel() {
         viewModel.apply {
             with(binding) {
                 val repo = intent.getParcelableExtra<SearchRepo>(Keys.AVATAR_REPO)
                 repo?.owner?.ownerImageUrl?.let { repoDetailPosterIV.loadUrl(it) }
-                repoDetailTitleTV.text = "Repo Name : " + repo?.repoName
-                repoDetailEmailTV.text = "Owner Email : " + repo?.owner?.email
-                repoDetaiForkCountTV.text = "Fork Count : " + repo?.forks.toString()
+                repoDetailTitleTV.text = "Repo Name : " + (repo?.repoName ?: "")
+                repoDetailEmailTV.text = "Owner Email : " + (repo?.owner?.email ?: "")
+                repoDetaiForkCountTV.text = "Fork Count : " + (repo?.forks?.toString() ?: "0")
 
                 observableState.observe(this@RepoDetailActivity, Observer {
                     with(it) {
                         when {
                             isLoadError -> Timber.d("error")
                             isLoading -> Timber.d("loading")
-                            isLoaded -> gotoUserDetail(it.data)
+                            isLoaded -> (it.data as? Owner)?.let { owner -> gotoUserDetail(owner) }
                         }
                     }
-
                 })
                 repoDetailPosterIV.onClick {
                     repo?.owner?.ownerName?.let { Action.ActionUserDetail(it) }
@@ -58,13 +61,12 @@ class RepoDetailActivity : BaseViewActivity<RepoDetailViewModel, RepoDetailActiv
         }
     }
 
-    private fun gotoUserDetail(data: Any) {
-        data as Owner
+    private fun gotoUserDetail(data: Owner) {
         start<UserDetailActivity> {
             putExtra(Keys.AVATAR_URL, data.ownerImageUrl)
             putExtra(Keys.AVATAR_NAME, data.ownerName)
             putExtra(Keys.AVATAR_EMAIL, data.email)
-            finish()
         }
+        finish()
     }
 }
