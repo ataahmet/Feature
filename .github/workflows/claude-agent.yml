@@ -80,20 +80,37 @@ jobs:
 
               ÇIKTI KURALLARI (ZORUNLU):
               - SADECE Kotlin kodu yaz
-              - İlk karakter package veya import olmalı
+              - İlk satır package veya import ile başlamalı
               - Hiçbir açıklama, markdown, \`\`\` işareti YAZMA
               - Dosyanın tamamını yaz, eksik bırakma
+              - Son satır } olmalı, sonrasına HİÇBİR ŞEY yazma
+              - KOD İÇİNE COMMENT YAZMA (// veya /* */ kullanma)
+              - Mevcut commentleri de sil
+              - Sadece çalışan Kotlin kodu olsun
 
               $(cat "$FILE")" > "${FILE}.raw"
 
-              # 2. Markdown artıklarını temizle
-              sed '/^```/d' "${FILE}.raw" > "${FILE}.step1"
+              # 2. Markdown ve comment artıklarını temizle
+              sed '/^```/d' "${FILE}.raw" \
+                | sed '/^\*\*/d' \
+                | sed '/^> /d' \
+                | sed '/^#[^!]/d' > "${FILE}.step1"
 
               # 3. İlk geçerli Kotlin satırından itibaren al
               sed -n '/^\(package\|import\|\/\*\|\/\/\|@\|class\|fun\|object\|interface\|enum\|sealed\|data\)/,$p' \
-                "${FILE}.step1" > "${FILE}.fixed"
+                "${FILE}.step1" > "${FILE}.step2"
 
-              # 4. Değişiklik olduysa uygula
+              # 4. Son } dan sonrasını at
+              awk '
+                { lines[NR] = $0 }
+                /^}/ { last_brace = NR }
+                END {
+                  for (i = 1; i <= last_brace; i++)
+                    print lines[i]
+                }
+              ' "${FILE}.step2" > "${FILE}.fixed"
+
+              # 5. Değişiklik olduysa uygula
               if [ -s "${FILE}.fixed" ] && ! diff -q "$FILE" "${FILE}.fixed" > /dev/null 2>&1; then
                 mv "${FILE}.fixed" "$FILE"
                 echo "✅ Fixed: $FILE"
@@ -101,8 +118,8 @@ jobs:
                 echo "⏭️ No changes: $FILE"
               fi
 
-              # 5. Temp dosyaları temizle
-              rm -f "${FILE}.raw" "${FILE}.step1" "${FILE}.fixed"
+              # 6. Temp dosyaları temizle
+              rm -f "${FILE}.raw" "${FILE}.step1" "${FILE}.step2" "${FILE}.fixed"
             fi
           done
 
