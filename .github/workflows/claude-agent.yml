@@ -29,16 +29,46 @@ jobs:
       - name: Install dependencies
         run: npm install -g @anthropic-ai/claude-code
 
-      - name: Auto Code Review
+      - name: Auto Code Review (PR açıldığında)
         if: github.event_name == 'pull_request'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
-          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
-          CHANGED_FILES=$(git diff --name-only origin/"$BASE_BRANCH"...HEAD | tr '\n' ' ')
-          PROMPT="Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} inceliyorsun..."
-          # CHANGED_FILES içeriğini doğrula (yalnızca geçerli dosya yolu karakterleri)
-          claude -p "$PROMPT" | gh pr comment "$PR_NUMBER" --body-file -
+          SAFE_BASE=$(echo "$BASE_BRANCH" | tr -cd '[:alnum:]/_.-')
+          CHANGED_FILES=$(git diff --name-only origin/"$SAFE_BASE"...HEAD | tr '\n' ' ')
+          SAFE_FILES=$(echo "$CHANGED_FILES" | tr -cd '[:alnum:]/._: -')
+          DIFF_CONTENT=$(git diff origin/"$SAFE_BASE"...HEAD -- *.kt *.java 2>/dev/null | head -c 8000)
+
+          PROMPT="Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} inceliyorsun.
+          Değişen dosyalar: ${SAFE_FILES}
+          Kod değişiklikleri:
+          ${DIFF_CONTENT}
+          Kotlin best practices, bug, performans ve güvenlik açısından Türkçe maddeler halinde yorum yap."
+
+          echo "$PROMPT" | claude -p - | gh pr comment "$PR_NUMBER" --body-file -
+
+      - name: On-demand Review (/review komutu)
+        if: |
+          github.event_name == 'issue_comment' &&
+          github.event.issue.pull_request != null &&
+          contains(github.event.comment.body, '/review')
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          BASE_BRANCH=$(gh pr view "$PR_NUMBER" --json baseRefName -q .baseRefName)
+          SAFE_BASE=$(echo "$BASE_BRANCH" | tr -cd '[:alnum:]/_.-')
+          git fetch origin "$SAFE_BASE"
+
+          DIFF_CONTENT=$(git diff origin/"$SAFE_BASE"...HEAD -- *.kt *.java 2>/dev/null | head -c 8000)
+
+          PROMPT="Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} için manuel review isteği geldi.
+          Kod değişiklikleri:
+          ${DIFF_CONTENT}
+          Detaylı Türkçe kod incelemesi yap."
+
+          echo "$PROMPT" | claude -p - | gh pr comment "$PR_NUMBER" --body-file -
