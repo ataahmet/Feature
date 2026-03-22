@@ -63,6 +63,7 @@ jobs:
 
           claude --dangerously-skip-permissions \
             --output-format stream-json \
+            --verbose \
             --max-turns 10 \
             -p "
           Sen bir Android Kotlin uzman geliştiricisin.
