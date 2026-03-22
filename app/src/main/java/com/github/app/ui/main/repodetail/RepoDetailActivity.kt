@@ -29,6 +29,11 @@ class RepoDetailActivity : BaseViewActivity<RepoDetailViewModel, RepoDetailActiv
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initializeViewModel()
+        getUsername(null)
+    }
+
+    fun getUsername(user: String?): String {
+        return user!!.length.toString()
     }
 
     private fun initializeViewModel() {
