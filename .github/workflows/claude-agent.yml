@@ -24,7 +24,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install dependencies
         run: npm install -g @anthropic-ai/claude-code
@@ -44,23 +44,3 @@ jobs:
             exit 0
           fi
           claude -p "Sen bir Android Kotlin uzmanısın. PR #$PR_NUMBER inceliyorsun. Base branch: $BASE_BRANCH. Değişen dosyalar: $CHANGED_FILES. Memory leak, null safety, Kotlin best practice kontrol et. Bug riski olan yerleri işaret et. Düzeltme önerileri sun. Sonucu Türkçe yaz." | gh pr comment $PR_NUMBER --body-file -
-
-      - name: Manuel Komut
-        if: github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          COMMENT="${{ github.event.comment.body }}"
-          PR_NUMBER=${{ github.event.issue.number }}
-          if echo "$COMMENT" | grep -q "@claude review"; then
-            PROMPT="Bu PR'ı detaylı code review yap."
-          elif echo "$COMMENT" | grep -q "@claude fix"; then
-            PROMPT="Bu PR'daki bug'ları tespit et ve düzeltilmiş kod öner."
-          elif echo "$COMMENT" | grep -q "@claude feature:"; then
-            FEATURE=$(echo "$COMMENT" | sed 's/.*@claude feature://')
-            PROMPT="Şu özelliği Kotlin ve MVVM mimarisine uygun ekle: $FEATURE"
-          fi
-          if [ -n "$PROMPT" ]; then
-            claude -p "$PROMPT" | gh pr comment $PR_NUMBER --body-file -
-          fi

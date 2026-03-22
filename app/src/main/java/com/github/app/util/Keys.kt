@@ -1,7 +1,7 @@
 package com.github.app.util
 
 /**
- * ahmet.ata keys.
+ * keys for using app
  */
 object Keys {
     const val USERNAME = "username"
