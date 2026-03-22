@@ -34,13 +34,13 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
-          PR_NUMBER=${{ github.event.pull_request.number }}
-          BASE_BRANCH=${{ github.event.pull_request.base.ref }}
-          HEAD_BRANCH=${{ github.event.pull_request.head.ref }}
-          CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH...HEAD)
+          CHANGED_FILES=$(git diff --name-only origin/"$BASE_BRANCH"...HEAD)
           if [ -z "$CHANGED_FILES" ]; then
             echo "Değişen dosya yok"
             exit 0
           fi
-          claude -p "Sen bir Android Kotlin uzmanısın. PR #$PR_NUMBER inceliyorsun. Base branch: $BASE_BRANCH. Değişen dosyalar: $CHANGED_FILES. Memory leak, null safety, Kotlin best practice kontrol et. Bug riski olan yerleri işaret et. Düzeltme önerileri sun. Sonucu Türkçe yaz." | gh pr comment $PR_NUMBER --body-file -
+          claude -p "Sen bir Android Kotlin uzmanısın. PR #$PR_NUMBER inceliyorsun. Base branch: $BASE_BRANCH. Değişen dosyalar: $CHANGED_FILES. Memory leak, null safety, Kotlin best practice kontrol et. Bug riski olan yerleri işaret et. Düzeltme önerileri sun. Sonucu Türkçe yaz." | gh pr comment "$PR_NUMBER" --body-file -
