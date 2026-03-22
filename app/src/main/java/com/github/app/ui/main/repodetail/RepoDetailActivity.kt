@@ -32,7 +32,7 @@ class RepoDetailActivity : BaseViewActivity<RepoDetailViewModel, RepoDetailActiv
     }
 
     fun getUsername(user: String?): String {
-        return user?.length?.toString() ?: ""
+        return user ?: ""
     }
 
     private fun initializeViewModel() {
@@ -70,3 +70,5 @@ class RepoDetailActivity : BaseViewActivity<RepoDetailViewModel, RepoDetailActiv
         finish()
     }
 }
+
+**Düzeltilen hata:** `getUsername` fonksiyonu `user?.length?.toString()` döndürüyordu — bu kullanıcı adının karakter sayısını döndürür. Doğrusu `user ?: ""` olmalı, yani kullanıcı adının kendisini döndürmeli.
