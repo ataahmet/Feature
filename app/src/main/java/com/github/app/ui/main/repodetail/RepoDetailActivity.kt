@@ -29,6 +29,9 @@ class RepoDetailActivity : BaseViewActivity<RepoDetailViewModel, RepoDetailActiv
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initializeViewModel()
+
+        val a : String?=null
+        a!!.length
     }
 
     private fun initializeViewModel() {
