@@ -1,6 +1,3 @@
-Dosyaya yazma izni verilmedi. Düzeltilmiş kodu aşağıda sunuyorum:
-
-```kotlin
 package com.github.app.ui.main.repodetail
 
 import android.os.Bundle
@@ -73,16 +70,3 @@ class RepoDetailActivity : BaseViewActivity<RepoDetailViewModel, RepoDetailActiv
         finish()
     }
 }
-```
-
-Yapılan düzeltmeler:
-
-1. **`getUsername(null)` çağrısı kaldırıldı** — `onCreate`'de `null` ile çağrılıyordu, bu doğrudan crash üretir.
-
-2. **`user!!` → `user?.length?.toString() ?: ""`** — `!!` operatörü null safety ihlali; `null` geldiğinde `NullPointerException` fırlatır.
-
-3. **`data as Owner` → `data as? Owner`** — Unsafe cast; `data` farklı bir tipte gelirse `ClassCastException`. Safe cast + `?.let` ile null-safe hale getirildi, `gotoUserDetail` parametresi de `Any` yerine `Owner` oldu.
-
-4. **`repo?.forks.toString()`** — `repo` null olduğunda `forks` null döner, `.toString()` "null" string üretir. `repo?.forks?.toString() ?: "0"` ile düzeltildi.
-
-5. **`finish()` `start` bloğunun dışına taşındı** — `start<UserDetailActivity> { ... }` bloğu bir `Intent` builder'dır; `finish()` içinde değil, activity başlatıldıktan sonra çağrılmalıdır.
