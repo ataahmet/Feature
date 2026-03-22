@@ -45,23 +45,20 @@ jobs:
             exit 0
           fi
 
-          SAFE_FILES=$(echo "$CHANGED_FILES" | grep -E '^[a-zA-Z0-9/_.-]+$' | head -50)
+          SAFE_FILES=$(echo "$CHANGED_FILES" | grep -E '^[a-zA-Z0-9/_.-]+$' | head -50 | tr '\n' ' ')
 
           if [ -z "$SAFE_FILES" ]; then
             echo "Geçerli dosya bulunamadı"
             exit 0
           fi
 
-          cat > /tmp/prompt.txt << 'EOF'
+          cat > /tmp/prompt.txt << EOF
           Sen bir Android Kotlin uzmanısın.
-          Aşağıdaki dosyaları incele:
-          CHANGED_FILES_PLACEHOLDER
+          Aşağıdaki dosyaları incele: $SAFE_FILES
           Memory leak, null safety, Kotlin best practice kontrol et.
           Bug riski olan yerleri işaret et.
           Düzeltme önerileri sun.
           Sonucu Türkçe yaz.
           EOF
-
-          sed -i "s|CHANGED_FILES_PLACEHOLDER|$SAFE_FILES|g" /tmp/prompt.txt
 
           claude -p "$(cat /tmp/prompt.txt)" | gh pr comment "$PR_NUMBER" --body-file -
