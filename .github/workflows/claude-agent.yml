@@ -39,8 +39,29 @@ jobs:
           HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
           CHANGED_FILES=$(git diff --name-only origin/"$BASE_BRANCH"...HEAD)
+
           if [ -z "$CHANGED_FILES" ]; then
             echo "Değişen dosya yok"
             exit 0
           fi
-          claude -p "Sen bir Android Kotlin uzmanısın. PR #$PR_NUMBER inceliyorsun. Base branch: $BASE_BRANCH. Değişen dosyalar: $CHANGED_FILES. Memory leak, null safety, Kotlin best practice kontrol et. Bug riski olan yerleri işaret et. Düzeltme önerileri sun. Sonucu Türkçe yaz." | gh pr comment "$PR_NUMBER" --body-file -
+
+          SAFE_FILES=$(echo "$CHANGED_FILES" | grep -E '^[a-zA-Z0-9/_.-]+$' | head -50)
+
+          if [ -z "$SAFE_FILES" ]; then
+            echo "Geçerli dosya bulunamadı"
+            exit 0
+          fi
+
+          cat > /tmp/prompt.txt << 'EOF'
+          Sen bir Android Kotlin uzmanısın.
+          Aşağıdaki dosyaları incele:
+          CHANGED_FILES_PLACEHOLDER
+          Memory leak, null safety, Kotlin best practice kontrol et.
+          Bug riski olan yerleri işaret et.
+          Düzeltme önerileri sun.
+          Sonucu Türkçe yaz.
+          EOF
+
+          sed -i "s|CHANGED_FILES_PLACEHOLDER|$SAFE_FILES|g" /tmp/prompt.txt
+
+          claude -p "$(cat /tmp/prompt.txt)" | gh pr comment "$PR_NUMBER" --body-file -
