@@ -1,0 +1,44 @@
+name: Claude AI Agent
+
+on:
+  pull_request:
+    types: [ opened, synchronize ]
+  issue_comment:
+    types: [ created ]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  claude-agent:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Auto Code Review
+        if: github.event_name == 'pull_request'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          CHANGED_FILES=$(git diff --name-only origin/"$BASE_BRANCH"...HEAD | tr '\n' ' ')
+          PROMPT="Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} inceliyorsun..."
+          # CHANGED_FILES içeriğini doğrula (yalnızca geçerli dosya yolu karakterleri)
+          claude -p "$PROMPT" | gh pr comment "$PR_NUMBER" --body-file -
