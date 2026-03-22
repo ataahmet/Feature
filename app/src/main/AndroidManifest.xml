@@ -24,6 +24,9 @@
             android:name=".ui.main.repodetail.RepoDetailActivity"
             android:configChanges="orientation" />
         <activity
+            android:name=".ui.login.LoginActivity"
+            android:configChanges="orientation" />
+        <activity
             android:name=".ui.main.splash.SplashActivity"
             android:configChanges="orientation"
             android:exported="true">

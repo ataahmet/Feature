@@ -11,4 +11,6 @@ object Keys {
     const val AVATAR_REPO = "avatar_repo"
     const val AVATAR_NAME = "avatar_name"
     const val AVATAR_EMAIL = "avatar_email"
+    const val REMEMBER_ME = "remember_me"
+    const val AUTH_TOKEN = "auth_token"
 }
