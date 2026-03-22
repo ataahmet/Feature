@@ -1,3 +1,6 @@
+Dosyaya yazma izni verilmedi. Düzeltilmiş kodu aşağıda sunuyorum:
+
+```kotlin
 package com.github.app.ui.main.repodetail
 
 import android.os.Bundle
@@ -29,11 +32,10 @@ class RepoDetailActivity : BaseViewActivity<RepoDetailViewModel, RepoDetailActiv
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initializeViewModel()
-        getUsername(null)
     }
 
     fun getUsername(user: String?): String {
-        return user!!.length.toString()
+        return user?.length?.toString() ?: ""
     }
 
     private fun initializeViewModel() {
@@ -41,19 +43,18 @@ class RepoDetailActivity : BaseViewActivity<RepoDetailViewModel, RepoDetailActiv
             with(binding) {
                 val repo = intent.getParcelableExtra<SearchRepo>(Keys.AVATAR_REPO)
                 repo?.owner?.ownerImageUrl?.let { repoDetailPosterIV.loadUrl(it) }
-                repoDetailTitleTV.text = "Repo Name : " + repo?.repoName
-                repoDetailEmailTV.text = "Owner Email : " + repo?.owner?.email
-                repoDetaiForkCountTV.text = "Fork Count : " + repo?.forks.toString()
+                repoDetailTitleTV.text = "Repo Name : " + (repo?.repoName ?: "")
+                repoDetailEmailTV.text = "Owner Email : " + (repo?.owner?.email ?: "")
+                repoDetaiForkCountTV.text = "Fork Count : " + (repo?.forks?.toString() ?: "0")
 
                 observableState.observe(this@RepoDetailActivity, Observer {
                     with(it) {
                         when {
                             isLoadError -> Timber.d("error")
                             isLoading -> Timber.d("loading")
-                            isLoaded -> gotoUserDetail(it.data)
+                            isLoaded -> (it.data as? Owner)?.let { owner -> gotoUserDetail(owner) }
                         }
                     }
-
                 })
                 repoDetailPosterIV.onClick {
                     repo?.owner?.ownerName?.let { Action.ActionUserDetail(it) }
@@ -63,13 +64,25 @@ class RepoDetailActivity : BaseViewActivity<RepoDetailViewModel, RepoDetailActiv
         }
     }
 
-    private fun gotoUserDetail(data: Any) {
-        data as Owner
+    private fun gotoUserDetail(data: Owner) {
         start<UserDetailActivity> {
             putExtra(Keys.AVATAR_URL, data.ownerImageUrl)
             putExtra(Keys.AVATAR_NAME, data.ownerName)
             putExtra(Keys.AVATAR_EMAIL, data.email)
-            finish()
         }
+        finish()
     }
 }
+```
+
+Yapılan düzeltmeler:
+
+1. **`getUsername(null)` çağrısı kaldırıldı** — `onCreate`'de `null` ile çağrılıyordu, bu doğrudan crash üretir.
+
+2. **`user!!` → `user?.length?.toString() ?: ""`** — `!!` operatörü null safety ihlali; `null` geldiğinde `NullPointerException` fırlatır.
+
+3. **`data as Owner` → `data as? Owner`** — Unsafe cast; `data` farklı bir tipte gelirse `ClassCastException`. Safe cast + `?.let` ile null-safe hale getirildi, `gotoUserDetail` parametresi de `Any` yerine `Owner` oldu.
+
+4. **`repo?.forks.toString()`** — `repo` null olduğunda `forks` null döner, `.toString()` "null" string üretir. `repo?.forks?.toString() ?: "0"` ile düzeltildi.
+
+5. **`finish()` `start` bloğunun dışına taşındı** — `start<UserDetailActivity> { ... }` bloğu bir `Intent` builder'dır; `finish()` içinde değil, activity başlatıldıktan sonra çağrılmalıdır.
