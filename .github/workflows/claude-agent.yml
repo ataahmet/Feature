@@ -49,7 +49,7 @@ jobs:
           PROMPT="Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} inceliyorsun.
           Değişen dosyalar: ${SAFE_FILES}
           Kod: ${DIFF_CONTENT}
-          
+
           Şunları incele ve Türkçe maddeler halinde yorum yap:
           - Null safety ihlalleri
           - Crash riski taşıyan satırlar
@@ -100,10 +100,10 @@ jobs:
               sed -n '/^\(package\|import\|\/\*\|\/\/\|@\|class\|fun\|object\|interface\|enum\|sealed\|data\)/,$p' \
                 "${FILE}.step1" > "${FILE}.step2"
 
-              # 4. Son } dan sonrasını at
+              # 4. Son } dan sonrasını at (girintili } de dahil)
               awk '
                 { lines[NR] = $0 }
-                /^}/ { last_brace = NR }
+                /}/ { last_brace = NR }
                 END {
                   for (i = 1; i <= last_brace; i++)
                     print lines[i]
