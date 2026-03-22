@@ -6,10 +6,11 @@ on:
   issue_comment:
     types: [ created ]
 
-    permissions:
-      contents: write
-      pull-requests: write
-      issues: write
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
 jobs:
   claude-agent:
     runs-on: ubuntu-latest
@@ -29,54 +30,4 @@ jobs:
         run: npm install -g @anthropic-ai/claude-code
 
       - name: Auto Code Review (PR açıldığında)
-        if: github.event_name == 'pull_request'
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-        run: |
-          PR_NUMBER=${{ github.event.pull_request.number }}
-          BASE_BRANCH=${{ github.event.pull_request.base.ref }}
-          HEAD_BRANCH=${{ github.event.pull_request.head.ref }}
-          
-          CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH...HEAD)
-          
-          claude --print "
-          Sen bir Android Kotlin uzmanısın.
-          PR #$PR_NUMBER inceliyorsun.
-          Base branch: $BASE_BRANCH
-          Değişen dosyalar:
-          $CHANGED_FILES
-          
-          Lütfen şunları yap:
-          1. Her dosyadaki değişiklikleri oku
-          2. Memory leak, null safety, Kotlin best practice kontrol et
-          3. Bug riski olan yerleri işaret et
-          4. Düzeltme önerileri sun
-          5. Sonucu Türkçe yaz
-          " | gh pr comment $PR_NUMBER --body-file -
-
-      - name: Manuel Komut (@claude review / feature / fix)
-        if: |
-          github.event_name == 'issue_comment' &&
-          contains(github.event.comment.body, '@claude')
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          COMMENT="${{ github.event.comment.body }}"
-          PR_NUMBER=${{ github.event.issue.number }}
-
-          if echo "$COMMENT" | grep -q "@claude review"; then
-            PROMPT="Bu PR'ı detaylı code review yap. CLAUDE.md dosyasındaki kurallara göre değerlendir."
-
-          elif echo "$COMMENT" | grep -q "@claude fix"; then
-            PROMPT="Bu PR'daki bug'ları tespit et ve her biri için düzeltilmiş kod öner."
-
-          elif echo "$COMMENT" | grep -q "@claude feature:"; then
-            FEATURE=$(echo "$COMMENT" | sed 's/.*@claude feature://')
-            PROMPT="feature/yeni-ozellik branch'i aç. Şu özelliği ekle: $FEATURE. Kotlin ve MVVM mimarisine uygun yaz."
-          fi
-
-          claude --print "$PROMPT" | gh pr comment $PR_NUMBER --body-file -
-        
+        if: github.event_name
