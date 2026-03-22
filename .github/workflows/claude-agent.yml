@@ -29,5 +29,38 @@ jobs:
       - name: Install dependencies
         run: npm install -g @anthropic-ai/claude-code
 
-      - name: Auto Code Review (PR açıldığında)
-        if: github.event_name
+      - name: Auto Code Review
+        if: github.event_name == 'pull_request'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          BASE_BRANCH=${{ github.event.pull_request.base.ref }}
+          HEAD_BRANCH=${{ github.event.pull_request.head.ref }}
+          CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH...HEAD)
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "Değişen dosya yok"
+            exit 0
+          fi
+          claude -p "Sen bir Android Kotlin uzmanısın. PR #$PR_NUMBER inceliyorsun. Base branch: $BASE_BRANCH. Değişen dosyalar: $CHANGED_FILES. Memory leak, null safety, Kotlin best practice kontrol et. Bug riski olan yerleri işaret et. Düzeltme önerileri sun. Sonucu Türkçe yaz." | gh pr comment $PR_NUMBER --body-file -
+
+      - name: Manuel Komut
+        if: github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          COMMENT="${{ github.event.comment.body }}"
+          PR_NUMBER=${{ github.event.issue.number }}
+          if echo "$COMMENT" | grep -q "@claude review"; then
+            PROMPT="Bu PR'ı detaylı code review yap."
+          elif echo "$COMMENT" | grep -q "@claude fix"; then
+            PROMPT="Bu PR'daki bug'ları tespit et ve düzeltilmiş kod öner."
+          elif echo "$COMMENT" | grep -q "@claude feature:"; then
+            FEATURE=$(echo "$COMMENT" | sed 's/.*@claude feature://')
+            PROMPT="Şu özelliği Kotlin ve MVVM mimarisine uygun ekle: $FEATURE"
+          fi
+          if [ -n "$PROMPT" ]; then
+            claude -p "$PROMPT" | gh pr comment $PR_NUMBER --body-file -
+          fi
