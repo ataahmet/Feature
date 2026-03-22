@@ -29,7 +29,30 @@ jobs:
       - name: Install dependencies
         run: npm install -g @anthropic-ai/claude-code
 
-      - name: Auto Code Review (PR açıldığında)
+      - name: Configure Git
+        run: |
+          git config --global user.name "Claude AI"
+          git config --global user.email "claude-ai@noreply.github.com"
+
+      - name: Create Python Parser Script
+        run: |
+          cat > /tmp/extract_kotlin.py << 'EOF'
+          import re
+          import sys
+
+          with open(sys.argv[1], 'r') as f:
+              content = f.read()
+
+          match = re.search(r'```(?:kotlin)?\n(.*?)```', content, re.DOTALL)
+          if match:
+              with open(sys.argv[2], 'w') as f:
+                  f.write(match.group(1))
+          else:
+              with open(sys.argv[2], 'w') as f:
+                  f.write(content)
+          EOF
+
+      - name: Auto Code Review
         if: github.event_name == 'pull_request'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -38,19 +61,95 @@ jobs:
           BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
         run: |
           SAFE_BASE=$(echo "$BASE_BRANCH" | tr -cd '[:alnum:]/_.-')
-          CHANGED_FILES=$(git diff --name-only origin/"$SAFE_BASE"...HEAD | tr '\n' ' ')
-          SAFE_FILES=$(echo "$CHANGED_FILES" | tr -cd '[:alnum:]/._: -')
+          SAFE_FILES=$(git diff --name-only origin/"$SAFE_BASE"...HEAD | tr '\n' ' ' | tr -cd '[:alnum:]/._: -')
           DIFF_CONTENT=$(git diff origin/"$SAFE_BASE"...HEAD -- *.kt *.java 2>/dev/null | head -c 8000)
 
           PROMPT="Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} inceliyorsun.
           Değişen dosyalar: ${SAFE_FILES}
-          Kod değişiklikleri:
-          ${DIFF_CONTENT}
-          Kotlin best practices, bug, performans ve güvenlik açısından Türkçe maddeler halinde yorum yap."
+          Kod: ${DIFF_CONTENT}
+
+          Şunları incele ve Türkçe maddeler halinde yorum yap:
+          - Null safety ihlalleri
+          - Crash riski taşıyan satırlar
+          - Performans sorunları
+          - Kotlin best practice ihlalleri
+          - Edge case'ler"
 
           echo "$PROMPT" | claude -p - | gh pr comment "$PR_NUMBER" --body-file -
 
-      - name: On-demand Review (/review komutu)
+      - name: Auto Fix Bugs
+        if: github.event_name == 'pull_request'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          SAFE_BASE=$(echo "$BASE_BRANCH" | tr -cd '[:alnum:]/_.-')
+          CHANGED_FILES=$(git diff --name-only origin/"$SAFE_BASE"...HEAD -- *.kt *.java 2>/dev/null)
+
+          > /tmp/fixed_files.txt
+
+          for FILE in $CHANGED_FILES; do
+            if [ -f "$FILE" ]; then
+
+              claude -p "Sen bir Android Kotlin uzmanısın.
+              Aşağıdaki dosyadaki hataları düzelt.
+              Cevabını MUTLAKA şu formatta ver:
+
+              \`\`\`kotlin
+              // düzeltilmiş kod buraya
+              \`\`\`
+
+              Kod bloğu dışına HİÇBİR ŞEY yazma.
+
+              $(cat "$FILE")" > "${FILE}.raw"
+
+              python3 /tmp/extract_kotlin.py "${FILE}.raw" "${FILE}.fixed"
+
+              if [ -s "${FILE}.fixed" ] && ! diff -q "$FILE" "${FILE}.fixed" > /dev/null 2>&1; then
+                mv "${FILE}.fixed" "$FILE"
+                echo "$FILE" >> /tmp/fixed_files.txt
+                echo "✅ Fixed: $FILE"
+              else
+                echo "⏭️ No changes: $FILE"
+              fi
+
+              rm -f "${FILE}.raw" "${FILE}.fixed"
+            fi
+          done
+
+          git add -A
+
+          if git diff --staged --quiet; then
+            echo "No fixes to commit."
+            exit 0
+          fi
+
+          git commit -m "🤖 Claude: Potential bugs fixed automatically"
+          git push origin HEAD:"$HEAD_BRANCH"
+
+      - name: Comment Fix Summary
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          if [ ! -s /tmp/fixed_files.txt ]; then
+            echo "No fixes, skipping comment."
+            exit 0
+          fi
+
+          COMMENT="🤖 **Claude otomatik düzeltme yaptı:**
+
+          $(cat /tmp/fixed_files.txt | sed 's/^/- /')
+
+          Lütfen değişiklikleri review edin."
+
+          echo "$COMMENT" | gh pr comment "$PR_NUMBER" --body-file -
+
+      - name: On-demand Review
         if: |
           github.event_name == 'issue_comment' &&
           github.event.issue.pull_request != null &&
@@ -67,8 +166,7 @@ jobs:
           DIFF_CONTENT=$(git diff origin/"$SAFE_BASE"...HEAD -- *.kt *.java 2>/dev/null | head -c 8000)
 
           PROMPT="Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} için manuel review isteği geldi.
-          Kod değişiklikleri:
-          ${DIFF_CONTENT}
+          Kod: ${DIFF_CONTENT}
           Detaylı Türkçe kod incelemesi yap."
 
           echo "$PROMPT" | claude -p - | gh pr comment "$PR_NUMBER" --body-file -
