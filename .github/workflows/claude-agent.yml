@@ -61,7 +61,10 @@ jobs:
             CLAUDE_MD=$(cat CLAUDE.md)
           fi
 
-          claude --dangerously-skip-permissions --print "
+          claude --dangerously-skip-permissions \
+            --output-format stream-json \
+            --max-turns 10 \
+            -p "
           Sen bir Android Kotlin uzman geliştiricisin.
           Aşağıdaki proje kurallarına kesinlikle uy:
 
@@ -78,8 +81,8 @@ jobs:
           - Null safety ihlali olmasın
           - Memory leak bırakma
           - Gerekli dosyaları oluştur veya düzenle
-          - Sadece görevi yap, açıklama yazma
-          "
+          - Sadece gorevi yap, aciklama yazma
+          " || true
 
       - name: Commit changes
         env:
