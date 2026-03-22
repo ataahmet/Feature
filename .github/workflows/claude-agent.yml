@@ -34,6 +34,24 @@ jobs:
           git config --global user.name "Claude AI"
           git config --global user.email "claude-ai@noreply.github.com"
 
+      - name: Create Python Parser Script
+        run: |
+          cat > /tmp/extract_kotlin.py << 'EOF'
+          import re
+          import sys
+
+          with open(sys.argv[1], 'r') as f:
+              content = f.read()
+
+          match = re.search(r'```(?:kotlin)?\n(.*?)```', content, re.DOTALL)
+          if match:
+              with open(sys.argv[2], 'w') as f:
+                  f.write(match.group(1))
+          else:
+              with open(sys.argv[2], 'w') as f:
+                  f.write(content)
+          EOF
+
       - name: Auto Code Review
         if: github.event_name == 'pull_request'
         env:
@@ -71,55 +89,34 @@ jobs:
           SAFE_BASE=$(echo "$BASE_BRANCH" | tr -cd '[:alnum:]/_.-')
           CHANGED_FILES=$(git diff --name-only origin/"$SAFE_BASE"...HEAD -- *.kt *.java 2>/dev/null)
 
+          > /tmp/fixed_files.txt
+
           for FILE in $CHANGED_FILES; do
             if [ -f "$FILE" ]; then
 
-              # 1. Claude'a sıkı prompt gönder
               claude -p "Sen bir Android Kotlin uzmanısın.
               Aşağıdaki dosyadaki hataları düzelt.
+              Cevabını MUTLAKA şu formatta ver:
 
-              ÇIKTI KURALLARI (ZORUNLU):
-              - SADECE Kotlin kodu yaz
-              - İlk satır package veya import ile başlamalı
-              - Hiçbir açıklama, markdown, \`\`\` işareti YAZMA
-              - Dosyanın tamamını yaz, eksik bırakma
-              - Son satır } olmalı, sonrasına HİÇBİR ŞEY yazma
-              - KOD İÇİNE COMMENT YAZMA (// veya /* */ kullanma)
-              - Mevcut commentleri de sil
-              - Sadece çalışan Kotlin kodu olsun
+              \`\`\`kotlin
+              // düzeltilmiş kod buraya
+              \`\`\`
+
+              Kod bloğu dışına HİÇBİR ŞEY yazma.
 
               $(cat "$FILE")" > "${FILE}.raw"
 
-              # 2. Markdown ve comment artıklarını temizle
-              sed '/^```/d' "${FILE}.raw" \
-                | sed '/^\*\*/d' \
-                | sed '/^> /d' \
-                | sed '/^#[^!]/d' > "${FILE}.step1"
+              python3 /tmp/extract_kotlin.py "${FILE}.raw" "${FILE}.fixed"
 
-              # 3. İlk geçerli Kotlin satırından itibaren al
-              sed -n '/^\(package\|import\|\/\*\|\/\/\|@\|class\|fun\|object\|interface\|enum\|sealed\|data\)/,$p' \
-                "${FILE}.step1" > "${FILE}.step2"
-
-              # 4. Son } dan sonrasını at (girintili } de dahil)
-              awk '
-                { lines[NR] = $0 }
-                /}/ { last_brace = NR }
-                END {
-                  for (i = 1; i <= last_brace; i++)
-                    print lines[i]
-                }
-              ' "${FILE}.step2" > "${FILE}.fixed"
-
-              # 5. Değişiklik olduysa uygula
               if [ -s "${FILE}.fixed" ] && ! diff -q "$FILE" "${FILE}.fixed" > /dev/null 2>&1; then
                 mv "${FILE}.fixed" "$FILE"
+                echo "$FILE" >> /tmp/fixed_files.txt
                 echo "✅ Fixed: $FILE"
               else
                 echo "⏭️ No changes: $FILE"
               fi
 
-              # 6. Temp dosyaları temizle
-              rm -f "${FILE}.raw" "${FILE}.step1" "${FILE}.step2" "${FILE}.fixed"
+              rm -f "${FILE}.raw" "${FILE}.fixed"
             fi
           done
 
@@ -138,19 +135,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
         run: |
-          SAFE_BASE=$(echo "$BASE_BRANCH" | tr -cd '[:alnum:]/_.-')
-          FIXED_FILES=$(git diff --name-only origin/"$SAFE_BASE"...HEAD)
+          if [ ! -s /tmp/fixed_files.txt ]; then
+            echo "No fixes, skipping comment."
+            exit 0
+          fi
 
-          if [ -n "$FIXED_FILES" ]; then
-            COMMENT="🤖 **Claude otomatik düzeltme yaptı:**
+          COMMENT="🤖 **Claude otomatik düzeltme yaptı:**
 
-          $(echo "$FIXED_FILES" | sed 's/^/- /')
+          $(cat /tmp/fixed_files.txt | sed 's/^/- /')
 
           Lütfen değişiklikleri review edin."
-            echo "$COMMENT" | gh pr comment "$PR_NUMBER" --body-file -
-          fi
+
+          echo "$COMMENT" | gh pr comment "$PR_NUMBER" --body-file -
 
       - name: On-demand Review
         if: |
