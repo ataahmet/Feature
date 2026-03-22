@@ -61,7 +61,7 @@ jobs:
             CLAUDE_MD=$(cat CLAUDE.md)
           fi
 
-          claude --print "
+          claude --dangerously-skip-permissions --print "
           Sen bir Android Kotlin uzman geliştiricisin.
           Aşağıdaki proje kurallarına kesinlikle uy:
 
