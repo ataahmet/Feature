@@ -104,14 +104,17 @@ jobs:
       - name: Push branch
         run: |
           git push origin "$BRANCH_NAME"
+          echo "Pushed branch: $BRANCH_NAME"
 
       - name: Open Pull Request
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TASK: ${{ github.event.inputs.task }}
         run: |
+          git fetch origin
           gh pr create \
             --title "🤖 feat: $TASK" \
+            --head "$BRANCH_NAME" \
             --body "## 🤖 Claude Agent PR
 
           ### 📋 Görev
