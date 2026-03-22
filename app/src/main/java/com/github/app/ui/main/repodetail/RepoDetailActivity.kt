@@ -70,5 +70,3 @@ class RepoDetailActivity : BaseViewActivity<RepoDetailViewModel, RepoDetailActiv
         finish()
     }
 }
-
-**Düzeltilen hata:** `getUsername` fonksiyonu `user?.length?.toString()` döndürüyordu — bu kullanıcı adının karakter sayısını döndürür. Doğrusu `user ?: ""` olmalı, yani kullanıcı adının kendisini döndürmeli.
