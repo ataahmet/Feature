@@ -5,6 +5,12 @@ on:
     types: [ opened, synchronize ]
   issue_comment:
     types: [ created ]
+  workflow_dispatch:
+    inputs:
+      task:
+        description: '🤖 Claude için görev (örn: Login ekranına beni hatırla ekle)'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -12,8 +18,127 @@ permissions:
   issues: write
 
 jobs:
+
+  # ──────────────────────────────────────────────
+  # YENİ JOB: Terminalden / GitHub UI'dan PR aç
+  # ──────────────────────────────────────────────
+  create-pr-from-prompt:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "Claude AI"
+          git config --global user.email "claude-ai@noreply.github.com"
+
+      - name: Create branch and run Claude
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TASK: ${{ github.event.inputs.task }}
+        run: |
+          BRANCH_NAME="feature/claude-$(date +%Y%m%d-%H%M%S)"
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
+          git checkout -b "$BRANCH_NAME"
+
+          CLAUDE_MD=""
+          if [ -f "CLAUDE.md" ]; then
+            CLAUDE_MD=$(cat CLAUDE.md)
+          fi
+
+          claude --print "
+          Sen bir Android Kotlin uzman geliştiricisin.
+          Aşağıdaki proje kurallarına kesinlikle uy:
+
+          $CLAUDE_MD
+
+          GÖREV:
+          $TASK
+
+          TALİMATLAR:
+          - Kotlin ile yaz
+          - MVI mimarisine uy
+          - DataBinding kullan, findViewById kullanma
+          - Hilt ile dependency injection yap
+          - Null safety ihlali olmasın
+          - Memory leak bırakma
+          - Gerekli dosyaları oluştur veya düzenle
+          - Sadece görevi yap, açıklama yazma
+          "
+
+      - name: Commit changes
+        env:
+          TASK: ${{ github.event.inputs.task }}
+        run: |
+          git add -A
+
+          if git diff --staged --quiet; then
+            echo "⚠️ Claude hiçbir değişiklik yapmadı."
+            exit 1
+          fi
+
+          TASK_SHORT=$(echo "$TASK" | cut -c1-72)
+          git commit -m "feat: $TASK_SHORT
+
+          🤖 Claude Agent tarafından otomatik oluşturuldu."
+
+      - name: Push branch
+        run: |
+          git push origin "$BRANCH_NAME"
+
+      - name: Open Pull Request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TASK: ${{ github.event.inputs.task }}
+        run: |
+          gh pr create \
+            --title "🤖 feat: $TASK" \
+            --body "## 🤖 Claude Agent PR
+
+          ### 📋 Görev
+          $TASK
+
+          ### 🏗️ Teknik Detaylar
+          | Başlık | Değer |
+          |--------|-------|
+          | Mimari | MVI |
+          | DI | Hilt |
+          | UI Binding | DataBinding |
+          | Dil | Kotlin |
+
+          ### ✅ Review Kontrol Listesi
+          - [ ] Kod review yapıldı
+          - [ ] Cihazda test edildi
+          - [ ] Memory leak kontrolü yapıldı
+          - [ ] Null safety kontrol edildi
+          - [ ] Rx thread kullanımı kontrol edildi
+
+          ---
+          > ⚠️ Bu PR Claude Agent tarafından otomatik oluşturulmuştur.
+          > Merge etmeden önce mutlaka review edin." \
+            --base main
+
+  # ──────────────────────────────────────────────
+  # MEVCUT JOB: PR açıldığında review + fix
+  # ──────────────────────────────────────────────
   claude-agent:
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'issue_comment'
 
     steps:
       - name: Checkout repository
@@ -36,7 +161,7 @@ jobs:
 
       - name: Create Python Parser Script
         run: |
-          cat > /tmp/extract_kotlin.py << 'EOF'
+          cat > /tmp/extract_kotlin.py << 'PYEOF'
           import re
           import sys
 
@@ -50,7 +175,7 @@ jobs:
           else:
               with open(sys.argv[2], 'w') as f:
                   f.write(content)
-          EOF
+          PYEOF
 
       - name: Auto Code Review
         if: github.event_name == 'pull_request'
