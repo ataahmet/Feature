@@ -138,7 +138,7 @@ jobs:
           ---
           > ⚠️ Bu PR Claude Agent tarafından otomatik oluşturulmuştur.
           > Merge etmeden önce mutlaka review edin." \
-            --base main
+            --base master
 
   # ──────────────────────────────────────────────
   # MEVCUT JOB: PR açıldığında review + fix
