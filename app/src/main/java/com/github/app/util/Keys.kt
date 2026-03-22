@@ -1,5 +1,8 @@
 package com.github.app.util
 
+/**
+ * ahmet.ata keys.
+ */
 object Keys {
     const val USERNAME = "username"
     const val PER_PAGE = 10
