@@ -6,8 +6,8 @@ import com.github.app.R
 import com.github.app.databinding.SplashActivityBinding
 import com.github.app.extension.listener
 import com.github.app.ui.base.BaseViewActivity
+import com.github.app.ui.login.LoginActivity
 import com.github.app.ui.main.MainActivity
-import com.github.app.ui.main.repodetail.RepoDetailViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import splitties.activities.start
 
@@ -27,10 +27,17 @@ class SplashActivity : BaseViewActivity<SplashViewModel, SplashActivityBinding>(
 
     private fun bindView() = binding.apply {
         this.motionLayout.listener {
-            gotoMainActivity()
+            gotoNextScreen()
         }
     }
 
-    private fun gotoMainActivity() = this.start<MainActivity>()
+    private fun gotoNextScreen() {
+        if (viewModel.hasToken()) {
+            start<MainActivity>()
+        } else {
+            start<LoginActivity>()
+        }
+        finish()
+    }
 
 }
