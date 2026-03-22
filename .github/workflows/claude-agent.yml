@@ -2,9 +2,11 @@ name: Claude AI Agent
 
 on:
   pull_request:
-    types: [ opened, synchronize ]
+    types: [opened, synchronize]
   issue_comment:
-    types: [ created ]
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
 
 permissions:
   contents: write
@@ -21,29 +23,36 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-
-      - name: Install dependencies
-        run: npm install -g @anthropic-ai/claude-code
-
-      - name: Check PR
-        run: gh pr view 8 --json title,body,files,additions,deletions,commits
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      # PR açıldığında/güncellendiğinde otomatik code review
       - name: Auto Code Review
         if: github.event_name == 'pull_request'
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
-          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
-        run: |
-          CHANGED_FILES=$(git diff --name-only origin/"$BASE_BRANCH"...HEAD | tr '\n' ' ')
-          PROMPT="Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} inceliyorsun..."
-          # CHANGED_FILES içeriğini doğrula (yalnızca geçerli dosya yolu karakterleri)
-          claude -p "$PROMPT" | gh pr comment "$PR_NUMBER" --body-file -
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Sen bir Android Kotlin uzmanısın. Bu PR'ı Türkçe olarak incele.
+
+            Lütfen şunları değerlendir:
+            1. Kod kalitesi ve okunabilirlik
+            2. Potansiyel bug'lar ve edge case'ler
+            3. Kotlin best practice uyumu
+            4. Performans ve bellek yönetimi
+            5. Android lifecycle ve coroutine kullanımı
+
+            PR değişikliklerini `git diff` ile inceleyip detaylı geri bildirim ver.
+            Bulguları PR'a yorum olarak ekle.
+          claude_args: |
+            --max-turns 5
+            --model claude-sonnet-4-6
+
+      # @claude mention ile interaktif kullanım (PR/issue yorumlarında)
+      - name: Claude Interactive Assistant
+        if: |
+          (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+          (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude'))
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: |
+            --max-turns 10
+            --model claude-sonnet-4-6
