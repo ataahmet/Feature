@@ -2,13 +2,13 @@ name: Claude AI Agent
 
 on:
   pull_request:
-    types: [ opened, synchronize ]
+    types: [opened, synchronize]
   issue_comment:
-    types: [ created ]
+    types: [created]
   workflow_dispatch:
     inputs:
       task:
-        description: '🤖 Claude için görev (örn: Login ekranına beni hatırla ekle)'
+        description: '🤖 Claude için görev'
         required: true
         type: string
 
@@ -19,25 +19,19 @@ permissions:
 
 jobs:
 
-  # ──────────────────────────────────────────────
-  # YENİ JOB: Terminalden / GitHub UI'dan PR aç
-  # ──────────────────────────────────────────────
   create-pr-from-prompt:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '24'
 
-      - name: Install dependencies
+      - name: Install Claude CLI
         run: npm install -g @anthropic-ai/claude-code
 
       - name: Configure Git
@@ -53,65 +47,48 @@ jobs:
         run: |
           BRANCH_NAME="feature/claude-$(date +%Y%m%d-%H%M%S)"
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
-
           git checkout -b "$BRANCH_NAME"
 
           CLAUDE_MD=""
-          if [ -f "CLAUDE.md" ]; then
-            CLAUDE_MD=$(cat CLAUDE.md)
-          fi
+          [ -f "CLAUDE.md" ] && CLAUDE_MD=$(cat CLAUDE.md)
 
           claude --dangerously-skip-permissions \
             --output-format stream-json \
             --verbose \
             --max-turns 30 \
-            -p "
-          Sen bir Android Kotlin uzman geliştiricisin.
-          Aşağıdaki proje kurallarına kesinlikle uy:
-
+            -p "Sen bir Android Kotlin uzman geliştiricisin.
+          Proje kuralları:
           $CLAUDE_MD
 
-          GÖREV:
-          $TASK
+          GÖREV: $TASK
 
           TALİMATLAR:
-          - Kotlin ile yaz
-          - MVI mimarisine uy
+          - Kotlin ile yaz, MVI mimarisine uy
           - DataBinding kullan, findViewById kullanma
           - Hilt ile dependency injection yap
-          - Null safety ihlali olmasın
-          - Memory leak bırakma
-          - Gerekli dosyaları oluştur veya düzenle
-          - Sadece gorevi yap, aciklama yazma
-          " || true
+          - Null safety ihlali olmasın, memory leak bırakma
+          - Sadece görevi yap, açıklama yazma" || true
 
-      - name: Commit changes
+      - name: Commit and push
         env:
           TASK: ${{ github.event.inputs.task }}
         run: |
           git add -A
-
           if git diff --staged --quiet; then
             echo "⚠️ Claude hiçbir değişiklik yapmadı."
             exit 1
           fi
-
           TASK_SHORT=$(echo "$TASK" | cut -c1-72)
           git commit -m "feat: $TASK_SHORT
 
           🤖 Claude Agent tarafından otomatik oluşturuldu."
-
-      - name: Push branch
-        run: |
           git push origin "$BRANCH_NAME"
-          echo "Pushed branch: $BRANCH_NAME"
 
       - name: Open Pull Request
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TASK: ${{ github.event.inputs.task }}
         run: |
-          git fetch origin
           gh pr create \
             --title "🤖 feat: $TASK" \
             --head "$BRANCH_NAME" \
@@ -133,32 +110,24 @@ jobs:
           - [ ] Cihazda test edildi
           - [ ] Memory leak kontrolü yapıldı
           - [ ] Null safety kontrol edildi
-          - [ ] Rx thread kullanımı kontrol edildi
 
           ---
-          > ⚠️ Bu PR Claude Agent tarafından otomatik oluşturulmuştur.
-          > Merge etmeden önce mutlaka review edin." \
+          > ⚠️ Bu PR Claude Agent tarafından otomatik oluşturulmuştur." \
             --base master
 
-  # ──────────────────────────────────────────────
-  # MEVCUT JOB: PR açıldığında review + fix
-  # ──────────────────────────────────────────────
   claude-agent:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || github.event_name == 'issue_comment'
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '24'
 
-      - name: Install dependencies
+      - name: Install Claude CLI
         run: npm install -g @anthropic-ai/claude-code
 
       - name: Configure Git
@@ -166,23 +135,24 @@ jobs:
           git config --global user.name "Claude AI"
           git config --global user.email "claude-ai@noreply.github.com"
 
+      # ✅ Düzeltme: Python indentation sorunu giderildi
       - name: Create Python Parser Script
         run: |
           cat > /tmp/extract_kotlin.py << 'PYEOF'
-          import re
-          import sys
+import re
+import sys
 
-          with open(sys.argv[1], 'r') as f:
-              content = f.read()
+with open(sys.argv[1], 'r') as f:
+    content = f.read()
 
-          match = re.search(r'```(?:kotlin)?\n(.*?)```', content, re.DOTALL)
-          if match:
-              with open(sys.argv[2], 'w') as f:
-                  f.write(match.group(1))
-          else:
-              with open(sys.argv[2], 'w') as f:
-                  f.write(content)
-          PYEOF
+match = re.search(r'```(?:kotlin)?\n(.*?)```', content, re.DOTALL)
+if match:
+    with open(sys.argv[2], 'w') as f:
+        f.write(match.group(1))
+else:
+    with open(sys.argv[2], 'w') as f:
+        f.write(content)
+PYEOF
 
       - name: Auto Code Review
         if: github.event_name == 'pull_request'
@@ -193,112 +163,42 @@ jobs:
           BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
         run: |
           SAFE_BASE=$(echo "$BASE_BRANCH" | tr -cd '[:alnum:]/_.-')
-          SAFE_FILES=$(git diff --name-only origin/"$SAFE_BASE"...HEAD | tr '\n' ' ' | tr -cd '[:alnum:]/._: -')
-          DIFF_CONTENT=$(git diff origin/"$SAFE_BASE"...HEAD -- *.kt *.java 2>/dev/null | head -c 8000)
+          git fetch origin "$SAFE_BASE" 2>/dev/null || true
 
-          PROMPT="Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} inceliyorsun.
-          Değişen dosyalar: ${SAFE_FILES}
-          Kod: ${DIFF_CONTENT}
+          SAFE_FILES=$(git diff --name-only origin/"$SAFE_BASE"...HEAD | tr '\n' ' ')
+          # ✅ Düzeltme: glob quote içinde
+          DIFF_CONTENT=$(git diff origin/"$SAFE_BASE"...HEAD -- '*.kt' '*.java' 2>/dev/null | head -c 8000)
 
-          Şunları incele ve Türkçe maddeler halinde yorum yap:
-          - Null safety ihlalleri
-          - Crash riski taşıyan satırlar
-          - Performans sorunları
-          - Kotlin best practice ihlalleri
-          - Edge case'ler"
+          if [ -z "$DIFF_CONTENT" ]; then
+            echo "No Kotlin/Java changes found, skipping review."
+            exit 0
+          fi
 
-          echo "$PROMPT" | claude -p - | gh pr comment "$PR_NUMBER" --body-file -
+          # ✅ Düzeltme: prompt dosyaya yaz
+          cat > /tmp/review_prompt.txt << PROMPT
+Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} inceliyorsun.
+Değişen dosyalar: ${SAFE_FILES}
+Kod:
+${DIFF_CONTENT}
+
+Şunları incele ve Türkçe maddeler halinde yorum yap:
+- Null safety ihlalleri
+- Crash riski taşıyan satırlar
+- Performans sorunları
+- Kotlin best practice ihlalleri
+- Edge case'ler
+PROMPT
+
+          # ✅ Düzeltme: çıktıyı dosyaya al, sonra yorum yap
+          claude -p "$(cat /tmp/review_prompt.txt)" > /tmp/review_output.txt 2>&1 || true
+
+          if [ -s /tmp/review_output.txt ]; then
+            gh pr comment "$PR_NUMBER" --body-file /tmp/review_output.txt
+          else
+            echo "Claude review output boş, yorum yapılmadı."
+          fi
 
       - name: Auto Fix Bugs
         if: github.event_name == 'pull_request'
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
-          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
-        run: |
-          SAFE_BASE=$(echo "$BASE_BRANCH" | tr -cd '[:alnum:]/_.-')
-          CHANGED_FILES=$(git diff --name-only origin/"$SAFE_BASE"...HEAD -- *.kt *.java 2>/dev/null)
-
-          > /tmp/fixed_files.txt
-
-          for FILE in $CHANGED_FILES; do
-            if [ -f "$FILE" ]; then
-
-              claude -p "Sen bir Android Kotlin uzmanısın.
-              Aşağıdaki dosyadaki hataları düzelt.
-              Cevabını MUTLAKA şu formatta ver:
-
-              \`\`\`kotlin
-              // düzeltilmiş kod buraya
-              \`\`\`
-
-              Kod bloğu dışına HİÇBİR ŞEY yazma.
-
-              $(cat "$FILE")" > "${FILE}.raw"
-
-              python3 /tmp/extract_kotlin.py "${FILE}.raw" "${FILE}.fixed"
-
-              if [ -s "${FILE}.fixed" ] && ! diff -q "$FILE" "${FILE}.fixed" > /dev/null 2>&1; then
-                mv "${FILE}.fixed" "$FILE"
-                echo "$FILE" >> /tmp/fixed_files.txt
-                echo "✅ Fixed: $FILE"
-              else
-                echo "⏭️ No changes: $FILE"
-              fi
-
-              rm -f "${FILE}.raw" "${FILE}.fixed"
-            fi
-          done
-
-          git add -A
-
-          if git diff --staged --quiet; then
-            echo "No fixes to commit."
-            exit 0
-          fi
-
-          git commit -m "🤖 Claude: Potential bugs fixed automatically"
-          git push origin HEAD:"$HEAD_BRANCH"
-
-      - name: Comment Fix Summary
-        if: github.event_name == 'pull_request'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: |
-          if [ ! -s /tmp/fixed_files.txt ]; then
-            echo "No fixes, skipping comment."
-            exit 0
-          fi
-
-          COMMENT="🤖 **Claude otomatik düzeltme yaptı:**
-
-          $(cat /tmp/fixed_files.txt | sed 's/^/- /')
-
-          Lütfen değişiklikleri review edin."
-
-          echo "$COMMENT" | gh pr comment "$PR_NUMBER" --body-file -
-
-      - name: On-demand Review
-        if: |
-          github.event_name == 'issue_comment' &&
-          github.event.issue.pull_request != null &&
-          contains(github.event.comment.body, '/review')
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.issue.number }}
-        run: |
-          BASE_BRANCH=$(gh pr view "$PR_NUMBER" --json baseRefName -q .baseRefName)
-          SAFE_BASE=$(echo "$BASE_BRANCH" | tr -cd '[:alnum:]/_.-')
-          git fetch origin "$SAFE_BASE"
-
-          DIFF_CONTENT=$(git diff origin/"$SAFE_BASE"...HEAD -- *.kt *.java 2>/dev/null | head -c 8000)
-
-          PROMPT="Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} için manuel review isteği geldi.
-          Kod: ${DIFF_CONTENT}
-          Detaylı Türkçe kod incelemesi yap."
-
-          echo "$PROMPT" | claude -p - | gh pr comment "$PR_NUMBER" --body-file -
+          ANTH
