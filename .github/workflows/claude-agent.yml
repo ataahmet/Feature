@@ -240,13 +240,13 @@ jobs:
           for FILE in $CHANGED_FILES; do
             [ -f "$FILE" ] || continue
 
-            printf '%s\n' "$(cat "$FILE")" > /tmp/current_file.txt
+            echo "Fix any bugs in this Kotlin file. Return ONLY the corrected code inside a kotlin code block, nothing else." > /tmp/prompt.txt
+            echo "" >> /tmp/prompt.txt
+            cat "$FILE" >> /tmp/prompt.txt
 
             claude --dangerously-skip-permissions \
-              -p "Fix any bugs in this Kotlin file. Return ONLY the corrected code inside a kotlin code block, nothing else.
-
-$(cat /tmp/current_file.txt)" > "${FILE}.raw" 2>/dev/null || {
-              echo "⚠️ Claude failed for $FILE, skipping."
+              -p "$(cat /tmp/prompt.txt)" > "${FILE}.raw" 2>/dev/null || {
+              echo "Claude failed for $FILE, skipping."
               continue
             }
 
@@ -260,7 +260,7 @@ $(cat /tmp/current_file.txt)" > "${FILE}.raw" 2>/dev/null || {
               echo "No changes: $FILE"
             fi
 
-            rm -f "${FILE}.raw" "${FILE}.fixed" /tmp/current_file.txt
+            rm -f "${FILE}.raw" "${FILE}.fixed" /tmp/prompt.txt
           done
 
           git add -A
@@ -284,12 +284,10 @@ $(cat /tmp/current_file.txt)" > "${FILE}.raw" 2>/dev/null || {
             exit 0
           fi
 
-          FIXED_LIST=$(sed 's/^/- /' /tmp/fixed_files.txt)
-          gh pr comment "$PR_NUMBER" --body "🤖 **Claude otomatik düzeltme yaptı:**
-
-${FIXED_LIST}
-
-Lütfen değişiklikleri review edin." || true
+          sed 's/^/- /' /tmp/fixed_files.txt > /tmp/fixed_list.txt
+          printf '🤖 **Claude otomatik duzeltme yapti:**\n\n%s\n\nLutfen degisiklikleri review edin.' \
+            "$(cat /tmp/fixed_list.txt)" > /tmp/fix_comment.txt
+          gh pr comment "$PR_NUMBER" --body-file /tmp/fix_comment.txt || true
 
       - name: On-demand Review
         if: |
