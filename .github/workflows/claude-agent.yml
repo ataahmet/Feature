@@ -193,21 +193,28 @@ jobs:
           BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
         run: |
           SAFE_BASE=$(echo "$BASE_BRANCH" | tr -cd '[:alnum:]/_.-')
-          SAFE_FILES=$(git diff --name-only origin/"$SAFE_BASE"...HEAD | tr '\n' ' ' | tr -cd '[:alnum:]/._: -')
-          DIFF_CONTENT=$(git diff origin/"$SAFE_BASE"...HEAD -- *.kt *.java 2>/dev/null | head -c 8000)
+          git fetch origin "$SAFE_BASE" 2>/dev/null || true
 
-          PROMPT="Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} inceliyorsun.
-          Değişen dosyalar: ${SAFE_FILES}
-          Kod: ${DIFF_CONTENT}
+          SAFE_FILES=$(git diff --name-only "origin/${SAFE_BASE}...HEAD" 2>/dev/null | tr '\n' ' ' | tr -cd '[:alnum:]/._: -')
+          DIFF_CONTENT=$(git diff "origin/${SAFE_BASE}...HEAD" -- '*.kt' '*.java' 2>/dev/null | head -c 8000 || true)
 
-          Şunları incele ve Türkçe maddeler halinde yorum yap:
+          REVIEW_PROMPT="Sen bir Android Kotlin uzmanisın. PR #${PR_NUMBER} inceliyorsun.
+          Degisen dosyalar: ${SAFE_FILES}
+
+          Sunları incele ve Turkce maddeler halinde yorum yap:
           - Null safety ihlalleri
-          - Crash riski taşıyan satırlar
+          - Crash riski tasıyan satirlar
           - Performans sorunları
           - Kotlin best practice ihlalleri
-          - Edge case'ler"
+          - Edge caseler"
 
-          echo "$PROMPT" | claude -p - | gh pr comment "$PR_NUMBER" --body-file -
+          claude --dangerously-skip-permissions \
+            -p "$REVIEW_PROMPT" > /tmp/review_result.txt 2>/dev/null || {
+            echo "Claude API failed for review, skipping."
+            exit 0
+          }
+
+          gh pr comment "$PR_NUMBER" --body-file /tmp/review_result.txt || true
 
       - name: Auto Fix Bugs
         if: github.event_name == 'pull_request'
@@ -219,37 +226,41 @@ jobs:
           HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
           SAFE_BASE=$(echo "$BASE_BRANCH" | tr -cd '[:alnum:]/_.-')
-          CHANGED_FILES=$(git diff --name-only origin/"$SAFE_BASE"...HEAD -- *.kt *.java 2>/dev/null)
+          git fetch origin "$SAFE_BASE" 2>/dev/null || true
+
+          CHANGED_FILES=$(git diff --name-only "origin/${SAFE_BASE}...HEAD" -- '*.kt' '*.java' 2>/dev/null || true)
+
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No Kotlin/Java files changed."
+            exit 0
+          fi
 
           > /tmp/fixed_files.txt
 
           for FILE in $CHANGED_FILES; do
-            if [ -f "$FILE" ]; then
+            [ -f "$FILE" ] || continue
 
-              claude -p "Sen bir Android Kotlin uzmanısın.
-              Aşağıdaki dosyadaki hataları düzelt.
-              Cevabını MUTLAKA şu formatta ver:
+            echo "Fix any bugs in this Kotlin file. Return ONLY the corrected code inside a kotlin code block, nothing else." > /tmp/prompt.txt
+            echo "" >> /tmp/prompt.txt
+            cat "$FILE" >> /tmp/prompt.txt
 
-              \`\`\`kotlin
-              // düzeltilmiş kod buraya
-              \`\`\`
+            claude --dangerously-skip-permissions \
+              -p "$(cat /tmp/prompt.txt)" > "${FILE}.raw" 2>/dev/null || {
+              echo "Claude failed for $FILE, skipping."
+              continue
+            }
 
-              Kod bloğu dışına HİÇBİR ŞEY yazma.
+            python3 /tmp/extract_kotlin.py "${FILE}.raw" "${FILE}.fixed"
 
-              $(cat "$FILE")" > "${FILE}.raw"
-
-              python3 /tmp/extract_kotlin.py "${FILE}.raw" "${FILE}.fixed"
-
-              if [ -s "${FILE}.fixed" ] && ! diff -q "$FILE" "${FILE}.fixed" > /dev/null 2>&1; then
-                mv "${FILE}.fixed" "$FILE"
-                echo "$FILE" >> /tmp/fixed_files.txt
-                echo "✅ Fixed: $FILE"
-              else
-                echo "⏭️ No changes: $FILE"
-              fi
-
-              rm -f "${FILE}.raw" "${FILE}.fixed"
+            if [ -s "${FILE}.fixed" ] && ! diff -q "$FILE" "${FILE}.fixed" > /dev/null 2>&1; then
+              mv "${FILE}.fixed" "$FILE"
+              echo "$FILE" >> /tmp/fixed_files.txt
+              echo "Fixed: $FILE"
+            else
+              echo "No changes: $FILE"
             fi
+
+            rm -f "${FILE}.raw" "${FILE}.fixed" /tmp/prompt.txt
           done
 
           git add -A
@@ -273,13 +284,10 @@ jobs:
             exit 0
           fi
 
-          COMMENT="🤖 **Claude otomatik düzeltme yaptı:**
-
-          $(cat /tmp/fixed_files.txt | sed 's/^/- /')
-
-          Lütfen değişiklikleri review edin."
-
-          echo "$COMMENT" | gh pr comment "$PR_NUMBER" --body-file -
+          sed 's/^/- /' /tmp/fixed_files.txt > /tmp/fixed_list.txt
+          printf '🤖 **Claude otomatik duzeltme yapti:**\n\n%s\n\nLutfen degisiklikleri review edin.' \
+            "$(cat /tmp/fixed_list.txt)" > /tmp/fix_comment.txt
+          gh pr comment "$PR_NUMBER" --body-file /tmp/fix_comment.txt || true
 
       - name: On-demand Review
         if: |
@@ -295,10 +303,8 @@ jobs:
           SAFE_BASE=$(echo "$BASE_BRANCH" | tr -cd '[:alnum:]/_.-')
           git fetch origin "$SAFE_BASE"
 
-          DIFF_CONTENT=$(git diff origin/"$SAFE_BASE"...HEAD -- *.kt *.java 2>/dev/null | head -c 8000)
+          claude --dangerously-skip-permissions \
+            -p "Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} icin manuel review istegi geldi. Detaylı Turkce kod incelemesi yap." \
+            > /tmp/ondemand_review.txt 2>/dev/null || { echo "Claude failed"; exit 0; }
 
-          PROMPT="Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} için manuel review isteği geldi.
-          Kod: ${DIFF_CONTENT}
-          Detaylı Türkçe kod incelemesi yap."
-
-          echo "$PROMPT" | claude -p - | gh pr comment "$PR_NUMBER" --body-file -
+          gh pr comment "$PR_NUMBER" --body-file /tmp/ondemand_review.txt || true
