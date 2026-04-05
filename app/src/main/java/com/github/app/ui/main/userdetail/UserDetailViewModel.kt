@@ -1,37 +1,21 @@
 package com.github.app.ui.main.userdetail
 
-import androidx.lifecycle.LiveData
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
+import androidx.paging.PagingData
 import com.github.app.domain.entity.SearchRepo
 import com.github.app.domain.usecase.UserRepoDataSourceUsace
 import com.github.app.reduce.Action
 import com.github.app.reduce.State
 import com.github.app.ui.base.BaseViewModel
-import com.github.app.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @HiltViewModel
 class UserDetailViewModel @Inject constructor(userRepoDataSourceUsace: UserRepoDataSourceUsace) :
     BaseViewModel<Action, State>() {
 
-    var liveDataUserRepoList: LiveData<PagedList<SearchRepo>>
-    private val compositeDisposable: CompositeDisposable = CompositeDisposable();
-    private val perPage: Int = Keys.PER_PAGE
+    val searchRepoPagingFlow: Flow<PagingData<SearchRepo>> =
+        userRepoDataSourceUsace.getUserRepoPagingFlow()
 
-    override fun bind() {
-
-    }
-
-    init {
-        userRepoDataSourceUsace.initSearchRepoUsacase(compositeDisposable)
-        val config = PagedList.Config.Builder()
-            .setPageSize(perPage)
-            .setInitialLoadSizeHint(perPage * 2)
-            .setEnablePlaceholders(false)
-            .build()
-        liveDataUserRepoList = LivePagedListBuilder(userRepoDataSourceUsace, config).build()
-    }
+    override fun bind() {}
 }
