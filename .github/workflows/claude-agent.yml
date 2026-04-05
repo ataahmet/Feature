@@ -194,9 +194,10 @@ jobs:
         run: |
           SAFE_BASE=$(echo "$BASE_BRANCH" | tr -cd '[:alnum:]/_.-')
           SAFE_FILES=$(git diff --name-only origin/"$SAFE_BASE"...HEAD | tr '\n' ' ' | tr -cd '[:alnum:]/._: -')
-          DIFF_CONTENT=$(git diff origin/"$SAFE_BASE"...HEAD -- *.kt *.java 2>/dev/null | head -c 8000)
+          DIFF_CONTENT=$(git diff origin/"$SAFE_BASE"...HEAD -- '*.kt' '*.java' 2>/dev/null | head -c 8000)
 
-          PROMPT="Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} inceliyorsun.
+          cat > /tmp/review_prompt.txt << EOF
+          Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} inceliyorsun.
           Değişen dosyalar: ${SAFE_FILES}
           Kod: ${DIFF_CONTENT}
 
@@ -205,9 +206,13 @@ jobs:
           - Crash riski taşıyan satırlar
           - Performans sorunları
           - Kotlin best practice ihlalleri
-          - Edge case'ler"
+          - Edge case'ler
+          EOF
 
-          echo "$PROMPT" | claude -p - | gh pr comment "$PR_NUMBER" --body-file -
+          claude --dangerously-skip-permissions \
+            -p "$(cat /tmp/review_prompt.txt)" > /tmp/review_result.txt
+
+          gh pr comment "$PR_NUMBER" --body-file /tmp/review_result.txt
 
       - name: Auto Fix Bugs
         if: github.event_name == 'pull_request'
@@ -219,14 +224,16 @@ jobs:
           HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
           SAFE_BASE=$(echo "$BASE_BRANCH" | tr -cd '[:alnum:]/_.-')
-          CHANGED_FILES=$(git diff --name-only origin/"$SAFE_BASE"...HEAD -- *.kt *.java 2>/dev/null)
+          CHANGED_FILES=$(git diff --name-only origin/"$SAFE_BASE"...HEAD -- '*.kt' '*.java' 2>/dev/null)
 
           > /tmp/fixed_files.txt
 
           for FILE in $CHANGED_FILES; do
             if [ -f "$FILE" ]; then
 
-              claude -p "Sen bir Android Kotlin uzmanısın.
+              FILE_CONTENT=$(cat "$FILE")
+              claude --dangerously-skip-permissions \
+                -p "Sen bir Android Kotlin uzmanısın.
               Aşağıdaki dosyadaki hataları düzelt.
               Cevabını MUTLAKA şu formatta ver:
 
@@ -236,7 +243,7 @@ jobs:
 
               Kod bloğu dışına HİÇBİR ŞEY yazma.
 
-              $(cat "$FILE")" > "${FILE}.raw"
+              ${FILE_CONTENT}" > "${FILE}.raw"
 
               python3 /tmp/extract_kotlin.py "${FILE}.raw" "${FILE}.fixed"
 
@@ -297,8 +304,9 @@ jobs:
 
           DIFF_CONTENT=$(git diff origin/"$SAFE_BASE"...HEAD -- *.kt *.java 2>/dev/null | head -c 8000)
 
-          PROMPT="Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} için manuel review isteği geldi.
+          claude --dangerously-skip-permissions \
+            -p "Sen bir Android Kotlin uzmanısın. PR #${PR_NUMBER} için manuel review isteği geldi.
           Kod: ${DIFF_CONTENT}
-          Detaylı Türkçe kod incelemesi yap."
+          Detaylı Türkçe kod incelemesi yap." > /tmp/ondemand_review.txt
 
-          echo "$PROMPT" | claude -p - | gh pr comment "$PR_NUMBER" --body-file -
+          gh pr comment "$PR_NUMBER" --body-file /tmp/ondemand_review.txt
