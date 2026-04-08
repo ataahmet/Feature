@@ -18,6 +18,9 @@
             android:name="com.github.app.ui.main.MainActivity"
             android:configChanges="orientation" />
         <activity
+            android:name="com.github.app.ui.login.LoginActivity"
+            android:configChanges="orientation" />
+        <activity
             android:name="com.github.app.ui.main.userdetail.UserDetailActivity"
             android:configChanges="orientation" />
         <activity

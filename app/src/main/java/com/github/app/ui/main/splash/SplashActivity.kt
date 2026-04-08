@@ -24,7 +24,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.github.app.ui.base.ComposeBaseActivity
-import com.github.app.ui.main.MainActivity
+import com.github.app.ui.login.LoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 import splitties.activities.start
 import kotlin.math.roundToInt
@@ -94,7 +94,7 @@ class SplashActivity : ComposeBaseActivity<SplashViewModel>() {
     }
 
     private fun gotoMainActivity() {
-        start<MainActivity>()
+        start<LoginActivity>()
         finish()
     }
 }
