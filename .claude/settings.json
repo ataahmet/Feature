@@ -12,5 +12,18 @@
       "Bash(delete:*)",
       "Bash(drop:*)"
     ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/ahmetata/AndroidStudioProjects/Feature/.claude/hooks/post-edit.sh"
+          }
+        ]
+      }
+    ]
   }
 }
