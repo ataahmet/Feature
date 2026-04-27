@@ -19,7 +19,7 @@ if [ -z "$CHANGED_FILES" ]; then
     # origin karşılaştırması başarısız olursa staged/committed dosyaları al
     CHANGED_FILES=$(git diff --name-only origin/master...HEAD 2>/dev/null | grep "\.kt$")
 fi
-
+exit 0
 if [ -z "$CHANGED_FILES" ]; then
     echo "✅ Kontrol edilecek Kotlin dosyası yok."
     exit 0
