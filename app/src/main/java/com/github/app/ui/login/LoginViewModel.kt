@@ -2,7 +2,6 @@ package com.github.app.ui.login
 
 import androidx.lifecycle.ViewModel
 import com.github.app.domain.usecase.login.LoginUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -14,7 +13,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import timber.log.Timber
 import javax.inject.Inject
-
 
 class LoginViewModel
     @Inject
