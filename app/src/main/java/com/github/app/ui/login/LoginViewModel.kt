@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import timber.log.Timber
 import javax.inject.Inject
 
-@HiltViewModel
+
 class LoginViewModel
     @Inject
     constructor(
