@@ -64,7 +64,8 @@ class LoginViewModel @Inject constructor(
                     Timber.e(error, "Login failed")
                 }
             )
-
+        val tmp: String?=null
+        tmp!!.length
         disposables.add(disposable)
     }
 
