@@ -9,7 +9,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.ReplaySubject
 
 abstract class BaseViewModel<A : BaseAction, S : BaseState> : ViewModel() {
-
     protected val actions: ReplaySubject<A> = ReplaySubject.create<A>()
 
     protected val initialState = State(isIdle = true)
@@ -24,24 +23,26 @@ abstract class BaseViewModel<A : BaseAction, S : BaseState> : ViewModel() {
 
     protected val reducer: Reducer<State, Change> = { state, change ->
         when (change) {
-            is Change.Loading -> state.copy(
-                isLoading = true,
-                isIdle = false,
-                isLoadError = false,
-                isLoaded = false
-            )
-            is Change.LoadError -> state.copy(
-                isLoading = false,
-                isLoadError = true,
-                isLoaded = false
-            )
-            is Change.Loaded -> state.copy(
-                isLoading = false,
-                isLoadError = false,
-                isLoaded = true,
-                data = change.value
-            )
-
+            is Change.Loading ->
+                state.copy(
+                    isLoading = true,
+                    isIdle = false,
+                    isLoadError = false,
+                    isLoaded = false,
+                )
+            is Change.LoadError ->
+                state.copy(
+                    isLoading = false,
+                    isLoadError = true,
+                    isLoaded = false,
+                )
+            is Change.Loaded ->
+                state.copy(
+                    isLoading = false,
+                    isLoadError = false,
+                    isLoaded = true,
+                    data = change.value,
+                )
         }
     }
 
@@ -49,12 +50,12 @@ abstract class BaseViewModel<A : BaseAction, S : BaseState> : ViewModel() {
         this.bind()
     }
 
-
-    val observableState: LiveData<S> = MediatorLiveData<S>().apply {
-        addSource(state) { data ->
-            postValue(data)
+    val observableState: LiveData<S> =
+        MediatorLiveData<S>().apply {
+            addSource(state) { data ->
+                postValue(data)
+            }
         }
-    }
 
     fun dispatch(action: A) {
         actions.onNext(action)
@@ -63,5 +64,4 @@ abstract class BaseViewModel<A : BaseAction, S : BaseState> : ViewModel() {
     override fun onCleared() {
         disposables.clear()
     }
-
 }

@@ -11,14 +11,15 @@ import javax.inject.Singleton
 @Module
 @InstallIn(ViewModelComponent::class)
 abstract class UseCaseModule {
-
     @Singleton
     @Binds
     abstract fun bindRepoListDataSourceFactory(repoListDataSourceUsace: RepoListDataUseCase): SearchRepoDataSourceUsace
 
     @Singleton
     @Binds
-    abstract fun bindUserRepoDataSourceFactory(userRepoDataSourceUsace: UserRepoDataSourceUsace): UserRepoListDataSourceUsace
+    abstract fun bindUserRepoDataSourceFactory(
+        userRepoDataSourceUsace: UserRepoDataSourceUsace,
+    ): UserRepoListDataSourceUsace
 
     @Singleton
     @Binds

@@ -18,11 +18,12 @@ abstract class BaseViewModel<A : BaseAction, S : BaseState> : ViewModel() {
 
     private val tag by lazy { javaClass.simpleName }
 
-    val observableState: LiveData<S> = MediatorLiveData<S>().apply {
-        addSource(state) { data ->
-            setValue(data)
+    val observableState: LiveData<S> =
+        MediatorLiveData<S>().apply {
+            addSource(state) { data ->
+                setValue(data)
+            }
         }
-    }
 
     fun dispatch(action: A) {
         actions.onNext(action)

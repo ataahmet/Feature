@@ -4,5 +4,5 @@ data class NavigationItem(
     val id: Int,
     val value: String,
     var showDialog: Boolean,
-    var isSelected: Boolean
+    var isSelected: Boolean,
 ) : Entity

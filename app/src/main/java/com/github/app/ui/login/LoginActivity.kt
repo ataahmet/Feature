@@ -11,7 +11,6 @@ import splitties.activities.start
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
-
     private val loginViewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,7 +19,7 @@ class LoginActivity : AppCompatActivity() {
             GithubTheme {
                 LoginScreen(
                     viewModel = loginViewModel,
-                    onLoginSuccess = { gotoMainActivity() }
+                    onLoginSuccess = { gotoMainActivity() },
                 )
             }
         }

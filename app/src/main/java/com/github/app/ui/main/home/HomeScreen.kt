@@ -26,7 +26,7 @@ import com.github.app.ui.components.SearchRepoCard
 fun HomeScreen(
     viewModel: HomeViewModel,
     onRepoClick: (SearchRepo) -> Unit,
-    onOwnerClick: (Owner) -> Unit
+    onOwnerClick: (Owner) -> Unit,
 ) {
     val state by viewModel.observableState.observeAsState(State(isIdle = true))
     val pagingItems = viewModel.searchRepoPagingFlow.collectAsLazyPagingItems()
@@ -41,34 +41,37 @@ fun HomeScreen(
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             items(
                 count = pagingItems.itemCount,
-                key = pagingItems.itemKey { it.id }
+                key = pagingItems.itemKey { it.id },
             ) { index ->
                 pagingItems[index]?.let { repo ->
                     SearchRepoCard(
                         repo = repo,
                         onImageClick = { viewModel.dispatch(Action.ActionUserDetail(it.owner?.ownerName ?: "")) },
-                        onCardClick = { onRepoClick(it) }
+                        onCardClick = { onRepoClick(it) },
                     )
                 }
             }
 
             when (pagingItems.loadState.append) {
-                is LoadState.Loading -> item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
+                is LoadState.Loading ->
+                    item {
+                        Box(
+                            modifier =
+                                Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
-                }
-                is LoadState.Error -> item {
-                    Text(
-                        text = "Yükleme hatası",
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
+                is LoadState.Error ->
+                    item {
+                        Text(
+                            text = "Yükleme hatası",
+                            modifier = Modifier.padding(16.dp),
+                        )
+                    }
                 else -> Unit
             }
         }

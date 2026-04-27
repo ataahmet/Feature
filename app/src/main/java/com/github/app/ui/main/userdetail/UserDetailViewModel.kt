@@ -11,11 +11,12 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @HiltViewModel
-class UserDetailViewModel @Inject constructor(userRepoDataSourceUsace: UserRepoDataSourceUsace) :
+class UserDetailViewModel
+    @Inject
+    constructor(userRepoDataSourceUsace: UserRepoDataSourceUsace) :
     BaseViewModel<Action, State>() {
+        val searchRepoPagingFlow: Flow<PagingData<SearchRepo>> =
+            userRepoDataSourceUsace.getUserRepoPagingFlow()
 
-    val searchRepoPagingFlow: Flow<PagingData<SearchRepo>> =
-        userRepoDataSourceUsace.getUserRepoPagingFlow()
-
-    override fun bind() {}
-}
+        override fun bind() {}
+    }

@@ -4,14 +4,13 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class SearchRepoItem(
-    val `items`: List<RepoItem?>?
+    val `items`: List<RepoItem?>?,
 ) : ApiEntity {
     @JsonClass(generateAdapter = true)
     data class RepoItem(
         val `id`: Int,
         val `name`: String?,
         val `forks`: Int,
-        val `owner`: OwnerItem?
-
+        val `owner`: OwnerItem?,
     ) : ApiEntity
 }

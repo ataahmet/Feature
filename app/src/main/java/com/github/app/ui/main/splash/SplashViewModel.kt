@@ -7,6 +7,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class SplashViewModel @Inject constructor() : BaseViewModel<Action, State>() {
-    override fun bind() {}
-}
+class SplashViewModel
+    @Inject
+    constructor() : BaseViewModel<Action, State>() {
+        override fun bind() {}
+    }

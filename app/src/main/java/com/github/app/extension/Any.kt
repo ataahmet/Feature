@@ -5,5 +5,4 @@ fun Any?.hashCode(): Int = this?.hashCode() ?: 0
 
 fun Any.getClassTag(): String = this.javaClass.simpleName
 
-fun Any.getMethodTag(): String =
-    getClassTag() + object : Any() {}.javaClass.enclosingMethod?.name
+fun Any.getMethodTag(): String = getClassTag() + object : Any() {}.javaClass.enclosingMethod?.name

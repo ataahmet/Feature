@@ -8,7 +8,6 @@ import javax.inject.Qualifier
 
 @HiltAndroidApp
 class App : Application() {
-
     @Stetho
     @Inject
     lateinit var stetho: AppInitializer

@@ -42,8 +42,9 @@ fun SeekBar.doOnStopTracking(action: (seekBar: SeekBar) -> Unit): SeekBar.OnSeek
  * @return the [SeekBar.OnSeekBarChangeListener] added to the SeekBar
  * @see SeekBar.OnSeekBarChangeListener.onProgressChanged
  */
-fun SeekBar.doOnChanged(action: (seekBar: SeekBar, progress: Int, fromUser: Boolean) -> Unit):
-    SeekBar.OnSeekBarChangeListener = setOnSeekBarChangeListener(onChanged = action)
+fun SeekBar.doOnChanged(
+    action: (seekBar: SeekBar, progress: Int, fromUser: Boolean) -> Unit,
+): SeekBar.OnSeekBarChangeListener = setOnSeekBarChangeListener(onChanged = action)
 
 /**
  * Set the listener to this SeekBar using the provided actions.
@@ -51,21 +52,26 @@ fun SeekBar.doOnChanged(action: (seekBar: SeekBar, progress: Int, fromUser: Bool
 fun SeekBar.setOnSeekBarChangeListener(
     onStartTracking: ((seekBar: SeekBar) -> Unit)? = null,
     onStopTracking: ((seekBar: SeekBar) -> Unit)? = null,
-    onChanged: ((seekBar: SeekBar, progress: Int, fromUser: Boolean) -> Unit)? = null
+    onChanged: ((seekBar: SeekBar, progress: Int, fromUser: Boolean) -> Unit)? = null,
 ): SeekBar.OnSeekBarChangeListener {
-    val listener = object : SeekBar.OnSeekBarChangeListener {
-        override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-            onChanged?.invoke(seekBar, progress, fromUser)
-        }
+    val listener =
+        object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(
+                seekBar: SeekBar,
+                progress: Int,
+                fromUser: Boolean,
+            ) {
+                onChanged?.invoke(seekBar, progress, fromUser)
+            }
 
-        override fun onStartTrackingTouch(seekBar: SeekBar) {
-            onStartTracking?.invoke(seekBar)
-        }
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+                onStartTracking?.invoke(seekBar)
+            }
 
-        override fun onStopTrackingTouch(seekBar: SeekBar) {
-            onStopTracking?.invoke(seekBar)
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                onStopTracking?.invoke(seekBar)
+            }
         }
-    }
     setOnSeekBarChangeListener(listener)
     return listener
 }

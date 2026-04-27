@@ -17,7 +17,6 @@ abstract class LocalDataSourceModule {
     @Binds
     abstract fun bindUserLocalDataSource(prodUserLocalDataSource: ProdUserLocalDataSource): UserLocalDataSource
 
-
     @Singleton
     @Binds
     abstract fun bindNavigationDataSource(prodNavigationDataSource: ProdNavigationDataSource): NavigationDataSource

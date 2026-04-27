@@ -5,6 +5,8 @@ import io.reactivex.Single
 
 interface UserRepository : Repository {
     fun getUserName(): String
+
     fun getUser(): Single<String>
+
     fun getUserDetail(ownerName: String): Single<Owner>
 }

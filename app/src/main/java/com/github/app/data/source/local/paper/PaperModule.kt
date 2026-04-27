@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-object PaperModule{
+object PaperModule {
     @Singleton
     @Provides
     fun provideDefaultBook(): Book = Paper.book()

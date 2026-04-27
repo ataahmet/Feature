@@ -7,8 +7,8 @@ import org.threeten.bp.format.DateTimeFormatter
 
 class DateAdapter {
     @ToJson
-    fun toJson(date: LocalDate) = DateTimeFormatter.ISO_LOCAL_DATE.format(date)
+    fun toJson(date: LocalDate): String? = DateTimeFormatter.ISO_LOCAL_DATE.format(date)
 
     @FromJson
-    fun fromJson(date: String) = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE)
+    fun fromJson(date: String): LocalDate? = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE)
 }

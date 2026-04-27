@@ -7,5 +7,5 @@ data class UserReposItem(
     val `id`: Int,
     val `name`: String?,
     val `owner`: OwnerItem?,
-    val `forks`: Int
+    val `forks`: Int,
 ) : ApiEntity

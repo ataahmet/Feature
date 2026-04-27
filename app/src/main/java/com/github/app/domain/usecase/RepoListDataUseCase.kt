@@ -16,31 +16,33 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @ViewModelScoped
-class RepoListDataUseCase @Inject constructor(
-    private var githubApi: GithubApi,
-    private var userRepository: UserRepository
-) : SearchRepoDataSourceUsace {
+class RepoListDataUseCase
+    @Inject
+    constructor(
+        private var githubApi: GithubApi,
+        private var userRepository: UserRepository,
+    ) : SearchRepoDataSourceUsace {
+        override fun userCache(): Observable<String> {
+            return userRepository.getUser().toObservable()
+        }
 
-    override fun userCache(): Observable<String> {
-        return userRepository.getUser().toObservable()
-    }
+        override fun userDetail(ownerName: String): Observable<Owner> {
+            return userRepository.getUserDetail(ownerName).toObservable()
+        }
 
-    override fun userDetail(ownerName: String): Observable<Owner> {
-        return userRepository.getUserDetail(ownerName).toObservable()
-    }
+        override fun initSearchRepoUsacase(mCompositeDisposable: CompositeDisposable) {
+            // Paging 3 ile disposable yönetimi PagingSource içinde yapılıyor
+        }
 
-    override fun initSearchRepoUsacase(mCompositeDisposable: CompositeDisposable) {
-        // Paging 3 ile disposable yönetimi PagingSource içinde yapılıyor
+        fun getSearchRepoPagingFlow(): Flow<PagingData<SearchRepo>> {
+            return Pager(
+                config =
+                    PagingConfig(
+                        pageSize = Keys.PER_PAGE,
+                        initialLoadSize = Keys.PER_PAGE * 2,
+                        enablePlaceholders = false,
+                    ),
+                pagingSourceFactory = { SearchRepoPagingSource(githubApi) },
+            ).flow
+        }
     }
-
-    fun getSearchRepoPagingFlow(): Flow<PagingData<SearchRepo>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = Keys.PER_PAGE,
-                initialLoadSize = Keys.PER_PAGE * 2,
-                enablePlaceholders = false
-            ),
-            pagingSourceFactory = { SearchRepoPagingSource(githubApi) }
-        ).flow
-    }
-}

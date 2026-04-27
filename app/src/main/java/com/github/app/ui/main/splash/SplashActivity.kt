@@ -31,7 +31,6 @@ import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class SplashActivity : ComposeBaseActivity<SplashViewModel>() {
-
     private val generateVM: SplashViewModel by viewModels()
 
     override fun provideViewModel() = generateVM
@@ -47,20 +46,28 @@ class SplashActivity : ComposeBaseActivity<SplashViewModel>() {
         val buttonSizePx = 64.dp
         var completed by remember { mutableStateOf(false) }
 
-        val fraction = if (containerWidth > 0f) {
-            (offsetX / (containerWidth - 64f * 3)).coerceIn(0f, 1f)
-        } else 0f
+        val fraction =
+            if (containerWidth > 0f) {
+                (offsetX / (containerWidth - 64f * 3)).coerceIn(0f, 1f)
+            } else {
+                0f
+            }
 
-        val startColor = Color(0xFFFEAC00)   // yellow_sea
-        val endColor = Color(0xFF3700B3)      // primary_dark
+        val startColor = Color(0xFFFEAC00) // yellow_sea
+        val endColor = Color(0xFF3700B3) // primary_dark
         val buttonColor by animateColorAsState(
-            targetValue = if (fraction >= 1f) endColor else startColor.copy(
-                red = startColor.red + (endColor.red - startColor.red) * fraction,
-                green = startColor.green + (endColor.green - startColor.green) * fraction,
-                blue = startColor.blue + (endColor.blue - startColor.blue) * fraction
-            ),
+            targetValue =
+                if (fraction >= 1f) {
+                    endColor
+                } else {
+                    startColor.copy(
+                        red = startColor.red + (endColor.red - startColor.red) * fraction,
+                        green = startColor.green + (endColor.green - startColor.green) * fraction,
+                        blue = startColor.blue + (endColor.blue - startColor.blue) * fraction,
+                    )
+                },
             animationSpec = tween(durationMillis = 100),
-            label = "buttonColor"
+            label = "buttonColor",
         )
 
         LaunchedEffect(completed) {
@@ -68,27 +75,32 @@ class SplashActivity : ComposeBaseActivity<SplashViewModel>() {
         }
 
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black)
-                .onGloballyPositioned { containerWidth = it.size.width.toFloat() }
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+                    .onGloballyPositioned { containerWidth = it.size.width.toFloat() },
         ) {
             Box(
-                modifier = Modifier
-                    .offset { IntOffset(offsetX.roundToInt(), 0) }
-                    .size(buttonSizePx)
-                    .background(buttonColor)
-                    .pointerInput(Unit) {
-                        detectHorizontalDragGestures(
-                            onDragEnd = {
+                modifier =
+                    Modifier
+                        .offset { IntOffset(offsetX.roundToInt(), 0) }
+                        .size(buttonSizePx)
+                        .background(buttonColor)
+                        .pointerInput(Unit) {
+                            detectHorizontalDragGestures(
+                                onDragEnd = {
+                                    if (fraction >= 1f) {
+                                        completed = true
+                                    } else {
+                                        offsetX = 0f
+                                    }
+                                },
+                            ) { _, dragAmount ->
+                                offsetX = (offsetX + dragAmount).coerceAtLeast(0f)
                                 if (fraction >= 1f) completed = true
-                                else offsetX = 0f
                             }
-                        ) { _, dragAmount ->
-                            offsetX = (offsetX + dragAmount).coerceAtLeast(0f)
-                            if (fraction >= 1f) completed = true
-                        }
-                    }
+                        },
             )
         }
     }

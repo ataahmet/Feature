@@ -20,23 +20,25 @@ fun SearchRepoCard(
     repo: SearchRepo,
     onImageClick: (SearchRepo) -> Unit = {},
     onCardClick: (SearchRepo) -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier
-            .padding(8.dp)
-            .clickable { onCardClick(repo) },
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        modifier =
+            modifier
+                .padding(8.dp)
+                .clickable { onCardClick(repo) },
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(8.dp),
         ) {
             RepoImage(
                 url = repo.owner?.ownerImageUrl,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clickable { onImageClick(repo) }
+                modifier =
+                    Modifier
+                        .size(48.dp)
+                        .clickable { onImageClick(repo) },
             )
             Column(modifier = Modifier.padding(start = 8.dp)) {
                 Text(text = repo.repoName ?: "", fontSize = 14.sp)

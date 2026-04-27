@@ -11,18 +11,18 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
-    prodGetNavigationItemUseCase: ProdGetNavigationItemUseCase
-) : BaseViewModel<Action, State>() {
+class MainViewModel
+    @Inject
+    constructor(
+        prodGetNavigationItemUseCase: ProdGetNavigationItemUseCase,
+    ) : BaseViewModel<Action, State>() {
+        override fun bind() {}
 
-    override fun bind() {}
+        val getNavigationItemLiveData: LiveData<List<NavigationItem>> get() = _navigaitonItemsData
 
-    val getNavigationItemLiveData: LiveData<List<NavigationItem>> get() = _navigaitonItemsData
+        private val _navigaitonItemsData = MutableLiveData<List<NavigationItem>>()
 
-    private val _navigaitonItemsData = MutableLiveData<List<NavigationItem>>()
-
-    init {
-        _navigaitonItemsData.value = prodGetNavigationItemUseCase.execute()
+        init {
+            _navigaitonItemsData.value = prodGetNavigationItemUseCase.execute()
+        }
     }
-
-}

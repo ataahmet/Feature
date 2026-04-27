@@ -16,22 +16,25 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(val repoListDataUseCase: RepoListDataUseCase) :
+class HomeViewModel
+    @Inject
+    constructor(val repoListDataUseCase: RepoListDataUseCase) :
     BaseViewModel<Action, State>() {
+        val searchRepoPagingFlow: Flow<PagingData<SearchRepo>> =
+            repoListDataUseCase.getSearchRepoPagingFlow()
 
-    val searchRepoPagingFlow: Flow<PagingData<SearchRepo>> =
-        repoListDataUseCase.getSearchRepoPagingFlow()
+        override fun bind() {
+            val userDetailRequest =
+                actions.ofType<Action.ActionUserDetail>().switchMap {
+                    repoListDataUseCase.userDetail(it.ownerName).subscribeOn(Schedulers.io())
+                        .map<Change> { Change.Loaded(it) }
+                        .onErrorReturn { Change.LoadError(it) }
+                        .startWith(Change.Loading)
+                }
 
-    override fun bind() {
-        val userDetailRequest = actions.ofType<Action.ActionUserDetail>().switchMap {
-            repoListDataUseCase.userDetail(it.ownerName).subscribeOn(Schedulers.io())
-                .map<Change> { Change.Loaded(it) }
-                .onErrorReturn { Change.LoadError(it) }
-                .startWith(Change.Loading)
+            disposables +=
+                userDetailRequest.scan(initialState, reducer)
+                    .distinctUntilChanged()
+                    .subscribe(state::postValue, Timber::e)
         }
-
-        disposables += userDetailRequest.scan(initialState, reducer)
-            .distinctUntilChanged()
-            .subscribe(state::postValue, Timber::e)
     }
-}

@@ -7,18 +7,20 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ProdUserLocalDataSource @Inject constructor(
-    private val defaultBook: Book
-) : UserLocalDataSource {
-    override fun getUser(): Single<String> {
-        return Single.just(defaultBook.read(Keys.USERNAME))
-    }
+class ProdUserLocalDataSource
+    @Inject
+    constructor(
+        private val defaultBook: Book,
+    ) : UserLocalDataSource {
+        override fun getUser(): Single<String> {
+            return Single.just(defaultBook.read(Keys.USERNAME))
+        }
 
-    override fun writeUserName(username: String) {
-        defaultBook.write(Keys.USERNAME, username)
-    }
+        override fun writeUserName(username: String) {
+            defaultBook.write(Keys.USERNAME, username)
+        }
 
-    override fun getUserName(): String {
-        return defaultBook.read<String>(Keys.USERNAME)?:""
+        override fun getUserName(): String {
+            return defaultBook.read<String>(Keys.USERNAME) ?: ""
+        }
     }
-}

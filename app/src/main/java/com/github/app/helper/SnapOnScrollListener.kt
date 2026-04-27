@@ -6,25 +6,31 @@ import androidx.recyclerview.widget.SnapHelper
 class SnapOnScrollListener(
     private val snapHelper: SnapHelper,
     private var behavior: Behavior = Behavior.NOTIFY_ON_SCROLL,
-    private var onSnapPositionChangeListener: (Int) -> Unit
+    private var onSnapPositionChangeListener: (Int) -> Unit,
 ) : RecyclerView.OnScrollListener() {
-
     enum class Behavior {
         NOTIFY_ON_SCROLL,
-        NOTIFY_ON_SCROLL_STATE_IDLE
+        NOTIFY_ON_SCROLL_STATE_IDLE,
     }
 
     private var snapPosition = RecyclerView.NO_POSITION
 
-    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+    override fun onScrolled(
+        recyclerView: RecyclerView,
+        dx: Int,
+        dy: Int,
+    ) {
         if (behavior == Behavior.NOTIFY_ON_SCROLL) {
             maybeNotifySnapPositionChange(recyclerView)
         }
     }
 
-    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-        if (behavior == Behavior.NOTIFY_ON_SCROLL_STATE_IDLE
-            && newState == RecyclerView.SCROLL_STATE_IDLE
+    override fun onScrollStateChanged(
+        recyclerView: RecyclerView,
+        newState: Int,
+    ) {
+        if (behavior == Behavior.NOTIFY_ON_SCROLL_STATE_IDLE &&
+            newState == RecyclerView.SCROLL_STATE_IDLE
         ) {
             maybeNotifySnapPositionChange(recyclerView)
         }
@@ -49,7 +55,7 @@ private fun SnapHelper.getSnapPosition(recyclerView: RecyclerView): Int {
 fun RecyclerView.attachSnapHelperWithListener(
     snapHelper: SnapHelper,
     behavior: SnapOnScrollListener.Behavior = SnapOnScrollListener.Behavior.NOTIFY_ON_SCROLL,
-    onSnapPositionChangeListener: (Int) -> Unit
+    onSnapPositionChangeListener: (Int) -> Unit,
 ) {
     snapHelper.attachToRecyclerView(this)
     val snapOnScrollListener =

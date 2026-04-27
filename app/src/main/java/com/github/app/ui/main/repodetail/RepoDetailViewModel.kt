@@ -13,19 +13,22 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class RepoDetailViewModel @Inject constructor(private val repoListDataUseCase: RepoListDataUseCase) :
+class RepoDetailViewModel
+    @Inject
+    constructor(private val repoListDataUseCase: RepoListDataUseCase) :
     BaseViewModel<Action, State>() {
+        override fun bind() {
+            val userDetailRequest =
+                actions.ofType<Action.ActionUserDetail>().switchMap {
+                    repoListDataUseCase.userDetail(it.ownerName).subscribeOn(Schedulers.io())
+                        .map<Change> { Change.Loaded(it) }
+                        .onErrorReturn { Change.LoadError(it) }
+                        .startWith(Change.Loading)
+                }
 
-     override fun bind() {
-        val userDetailRequest = actions.ofType<Action.ActionUserDetail>().switchMap {
-            repoListDataUseCase.userDetail(it.ownerName).subscribeOn(Schedulers.io())
-                .map<Change> { Change.Loaded(it) }
-                .onErrorReturn { Change.LoadError(it) }
-                .startWith(Change.Loading)
+            disposables +=
+                userDetailRequest.scan(initialState, reducer)
+                    .distinctUntilChanged()
+                    .subscribe(state::postValue, Timber::e)
         }
-
-        disposables += userDetailRequest.scan(initialState, reducer)
-            .distinctUntilChanged()
-            .subscribe(state::postValue, Timber::e)
     }
-}

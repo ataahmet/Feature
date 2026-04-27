@@ -5,6 +5,8 @@ import io.reactivex.Single
 
 interface UserLocalDataSource : LocalDataSource {
     fun writeUserName(username: String)
+
     fun getUserName(): String
+
     fun getUser(): Single<String>
 }

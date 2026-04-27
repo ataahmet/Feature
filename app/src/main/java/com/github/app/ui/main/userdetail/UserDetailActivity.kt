@@ -31,7 +31,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class UserDetailActivity : ComposeBaseActivity<UserDetailViewModel>() {
-
     private val generateVM: UserDetailViewModel by viewModels()
 
     override fun provideViewModel() = generateVM
@@ -56,37 +55,38 @@ class UserDetailActivity : ComposeBaseActivity<UserDetailViewModel>() {
                         IconButton(onClick = { finish() }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Geri"
+                                contentDescription = "Geri",
                             )
                         }
-                    }
+                    },
                 )
-            }
+            },
         ) { paddingValues ->
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(16.dp),
             ) {
                 RepoImage(
                     url = avatarUrl,
-                    modifier = Modifier.size(120.dp)
+                    modifier = Modifier.size(120.dp),
                 )
                 Text(
                     text = ownerName ?: "",
                     fontSize = 20.sp,
-                    modifier = Modifier.padding(top = 12.dp)
+                    modifier = Modifier.padding(top = 12.dp),
                 )
                 Text(
                     text = ownerEmail ?: "",
                     fontSize = 16.sp,
-                    modifier = Modifier.padding(top = 4.dp)
+                    modifier = Modifier.padding(top = 4.dp),
                 )
                 LazyRow(modifier = Modifier.padding(top = 16.dp)) {
                     items(
                         count = pagingItems.itemCount,
-                        key = pagingItems.itemKey { it.id }
+                        key = pagingItems.itemKey { it.id },
                     ) { index ->
                         pagingItems[index]?.let { repo ->
                             SearchRepoCard(repo = repo)

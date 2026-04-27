@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import com.github.app.ui.theme.GithubTheme
 
 abstract class ComposeBaseActivity<M : BaseViewModel<*, *>> : BaseActivity<M>() {
-
     @Composable
     abstract fun Content()
 

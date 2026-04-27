@@ -6,7 +6,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 
 abstract class BaseActivity<M : BaseViewModel<*, *>> : AppCompatActivity() {
-
     private val disposables = CompositeDisposable()
 
     protected lateinit var viewModel: M

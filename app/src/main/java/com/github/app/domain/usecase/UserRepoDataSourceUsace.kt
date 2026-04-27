@@ -14,23 +14,25 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @ViewModelScoped
-class UserRepoDataSourceUsace @Inject constructor(
-    private var githubApi: GithubApi,
-    private var userRepository: UserRepository
-) : UserRepoListDataSourceUsace {
+class UserRepoDataSourceUsace
+    @Inject
+    constructor(
+        private var githubApi: GithubApi,
+        private var userRepository: UserRepository,
+    ) : UserRepoListDataSourceUsace {
+        override fun initSearchRepoUsacase(mCompositeDisposable: CompositeDisposable) {
+            // Paging 3 ile disposable yönetimi PagingSource içinde yapılıyor
+        }
 
-    override fun initSearchRepoUsacase(mCompositeDisposable: CompositeDisposable) {
-        // Paging 3 ile disposable yönetimi PagingSource içinde yapılıyor
+        fun getUserRepoPagingFlow(): Flow<PagingData<SearchRepo>> {
+            return Pager(
+                config =
+                    PagingConfig(
+                        pageSize = Keys.PER_PAGE,
+                        initialLoadSize = Keys.PER_PAGE * 2,
+                        enablePlaceholders = false,
+                    ),
+                pagingSourceFactory = { UserRepoPagingSource(githubApi, userRepository) },
+            ).flow
+        }
     }
-
-    fun getUserRepoPagingFlow(): Flow<PagingData<SearchRepo>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = Keys.PER_PAGE,
-                initialLoadSize = Keys.PER_PAGE * 2,
-                enablePlaceholders = false
-            ),
-            pagingSourceFactory = { UserRepoPagingSource(githubApi, userRepository) }
-        ).flow
-    }
-}

@@ -5,7 +5,6 @@ import io.reactivex.Single
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -14,7 +13,6 @@ import org.junit.Before
 import org.junit.Test
 
 class LoginViewModelTest {
-
     private lateinit var viewModel: LoginViewModel
     private lateinit var fakeLoginUseCase: FakeLoginUseCase
 
@@ -67,20 +65,22 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `login with empty email should emit error effect`() = runBlocking {
-        viewModel.onEvent(LoginEvent.OnPasswordChanged("123456"))
-        viewModel.onEvent(LoginEvent.OnLoginClicked)
+    fun `login with empty email should emit error effect`() =
+        runBlocking {
+            viewModel.onEvent(LoginEvent.OnPasswordChanged("123456"))
+            viewModel.onEvent(LoginEvent.OnLoginClicked)
 
-        assertTrue(viewModel.state.value.loginState is LoginState.Idle)
-    }
+            assertTrue(viewModel.state.value.loginState is LoginState.Idle)
+        }
 
     @Test
-    fun `login with empty password should emit error effect`() = runBlocking {
-        viewModel.onEvent(LoginEvent.OnEmailChanged("test@test.com"))
-        viewModel.onEvent(LoginEvent.OnLoginClicked)
+    fun `login with empty password should emit error effect`() =
+        runBlocking {
+            viewModel.onEvent(LoginEvent.OnEmailChanged("test@test.com"))
+            viewModel.onEvent(LoginEvent.OnLoginClicked)
 
-        assertTrue(viewModel.state.value.loginState is LoginState.Idle)
-    }
+            assertTrue(viewModel.state.value.loginState is LoginState.Idle)
+        }
 
     @Test
     fun `login failure should set error state`() {
@@ -97,6 +97,9 @@ class LoginViewModelTest {
     private class FakeLoginUseCase : LoginUseCase {
         var result: Single<String> = Single.just("token")
 
-        override fun login(email: String, password: String): Single<String> = result
+        override fun login(
+            email: String,
+            password: String,
+        ): Single<String> = result
     }
 }

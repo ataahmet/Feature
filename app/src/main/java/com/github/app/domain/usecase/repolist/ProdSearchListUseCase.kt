@@ -7,10 +7,12 @@ import io.reactivex.Observable
 import javax.inject.Inject
 
 @ViewModelScoped
-class ProdSearchListUseCase @Inject constructor(
-    private val searchRepository: SearchRepository
-) : RepoListUseCase {
-    override fun repoList(): Observable<List<SearchRepo>> {
-        return Observable.just(null)
+class ProdSearchListUseCase
+    @Inject
+    constructor(
+        private val searchRepository: SearchRepository,
+    ) : RepoListUseCase {
+        override fun repoList(): Observable<List<SearchRepo>> {
+            return Observable.just(null)
+        }
     }
-}

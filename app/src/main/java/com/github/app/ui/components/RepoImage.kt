@@ -7,19 +7,25 @@ import androidx.compose.ui.draw.clip
 import coil.compose.AsyncImage
 
 @Composable
-fun RepoImage(url: String?, modifier: Modifier = Modifier) {
+fun RepoImage(
+    url: String?,
+    modifier: Modifier = Modifier,
+) {
     AsyncImage(
         model = url,
         contentDescription = null,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
 @Composable
-fun RepoImageCircle(url: String?, modifier: Modifier = Modifier) {
+fun RepoImageCircle(
+    url: String?,
+    modifier: Modifier = Modifier,
+) {
     AsyncImage(
         model = url,
         contentDescription = null,
-        modifier = modifier.clip(CircleShape)
+        modifier = modifier.clip(CircleShape),
     )
 }

@@ -5,5 +5,5 @@ data class State(
     val isLoading: Boolean = false,
     val isLoadError: Boolean = false,
     val isLoaded: Boolean = false,
-    val data: Any = ""
+    val data: Any = "",
 ) : BaseState

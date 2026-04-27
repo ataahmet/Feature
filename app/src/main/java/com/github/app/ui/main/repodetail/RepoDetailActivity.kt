@@ -28,7 +28,6 @@ import splitties.activities.start
 
 @AndroidEntryPoint
 class RepoDetailActivity : ComposeBaseActivity<RepoDetailViewModel>() {
-
     private val generateVM: RepoDetailViewModel by viewModels()
 
     override fun provideViewModel() = generateVM
@@ -53,34 +52,36 @@ class RepoDetailActivity : ComposeBaseActivity<RepoDetailViewModel>() {
         }
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
         ) {
             RepoImage(
                 url = repo?.owner?.ownerImageUrl,
-                modifier = Modifier
-                    .size(120.dp)
-                    .clickable {
-                        repo?.owner?.ownerName?.let {
-                            viewModel.dispatch(Action.ActionUserDetail(it))
-                        }
-                    }
+                modifier =
+                    Modifier
+                        .size(120.dp)
+                        .clickable {
+                            repo?.owner?.ownerName?.let {
+                                viewModel.dispatch(Action.ActionUserDetail(it))
+                            }
+                        },
             )
             Text(
                 text = "Repo Name : ${repo?.repoName ?: ""}",
                 fontSize = 18.sp,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 16.dp),
             )
             Text(
                 text = "Owner Email : ${repo?.owner?.email ?: ""}",
                 fontSize = 16.sp,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.dp),
             )
             Text(
                 text = "Fork Count : ${repo?.forks?.toString() ?: "0"}",
                 fontSize = 16.sp,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.dp),
             )
         }
     }

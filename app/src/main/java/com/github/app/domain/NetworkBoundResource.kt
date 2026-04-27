@@ -12,51 +12,60 @@ abstract class NetworkBoundResource<RequestType, ResultType> {
 
     init {
         @Suppress("LeakingThis")
-        result = when {
-            shouldFetch() -> createCall()
-                .toObservable()
-                // Request API on IO Scheduler
-                .subscribeOn(Schedulers.io())
-                // Read/Write to disk on Computation Scheduler
-                .observeOn(Schedulers.computation())
-                .map<Resource<ResultType>> {
-                    mapCallResult(it).let {
-                        saveCallResult(it)
-                        Success(it)
-                    }
-                }
-                .onErrorReturn {
-                    when (it) {
-                        is HttpException -> when (it.code()) {
-                            401 -> UnauthorizedError()
-                            422 -> FormError(it.message(), mapOf())
-                            in 400..499 -> MessageError(it.message())
-                            in 500..599 -> ServerError()
-                            else -> UnknownError()
+        result =
+            when {
+                shouldFetch() ->
+                    createCall()
+                        .toObservable()
+                        // Request API on IO Scheduler
+                        .subscribeOn(Schedulers.io())
+                        // Read/Write to disk on Computation Scheduler
+                        .observeOn(Schedulers.computation())
+                        .map<Resource<ResultType>> {
+                            mapCallResult(it).let {
+                                saveCallResult(it)
+                                Success(it)
+                            }
                         }
-                        is IOException -> NetworkError()
-                        else -> UnknownError()
-                    }
-                }
-                // Read results in Android Main Thread (UI)
-                //.observeOn(AndroidSchedulers.mainThread())
-                .startWith(Loading())
+                        .onErrorReturn {
+                            when (it) {
+                                is HttpException ->
+                                    when (it.code()) {
+                                        401 -> UnauthorizedError()
+                                        422 -> FormError(it.message(), mapOf())
+                                        in 400..499 -> MessageError(it.message())
+                                        in 500..599 -> ServerError()
+                                        else -> UnknownError()
+                                    }
+                                is IOException -> NetworkError()
+                                else -> UnknownError()
+                            }
+                        }
+                        // Read results in Android Main Thread (UI)
+                        // .observeOn(AndroidSchedulers.mainThread())
+                        .startWith(Loading())
 
-            else -> loadFromDb()
-                .subscribeOn(Schedulers.computation())
-                .map<Resource<ResultType>> { Success(it) }
-                .onErrorReturn { UnknownError() }
-                // Read results in Android Main Thread (UI)
-                //.observeOn(AndroidSchedulers.mainThread())
-                .startWith(Loading())
-                .toObservable()
-        }
+                else ->
+                    loadFromDb()
+                        .subscribeOn(Schedulers.computation())
+                        .map<Resource<ResultType>> { Success(it) }
+                        .onErrorReturn { UnknownError() }
+                        // Read results in Android Main Thread (UI)
+                        // .observeOn(AndroidSchedulers.mainThread())
+                        .startWith(Loading())
+                        .toObservable()
+            }
     }
 
     protected open fun shouldFetch() = true
+
     protected open fun loadFromDb(): Flowable<ResultType> = Flowable.empty()
+
     protected abstract fun createCall(): Single<RequestType>
+
     protected abstract fun mapCallResult(response: RequestType): ResultType
+
     protected open fun saveCallResult(result: ResultType) {}
+
     fun asObservable() = result
 }

@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
-    onLoginSuccess: (String) -> Unit
+    onLoginSuccess: (String) -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -52,19 +52,20 @@ fun LoginScreen(
 
     Box(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             Text(
                 text = "Giris Yap",
                 style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onBackground,
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -75,14 +76,16 @@ fun LoginScreen(
                 label = { Text("E-posta") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
-                ),
-                enabled = state.loginState !is LoginState.Loading
+                keyboardOptions =
+                    KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Next,
+                    ),
+                keyboardActions =
+                    KeyboardActions(
+                        onNext = { focusManager.moveFocus(FocusDirection.Down) },
+                    ),
+                enabled = state.loginState !is LoginState.Loading,
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -94,17 +97,19 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        focusManager.clearFocus()
-                        viewModel.onEvent(LoginEvent.OnLoginClicked)
-                    }
-                ),
-                enabled = state.loginState !is LoginState.Loading
+                keyboardOptions =
+                    KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done,
+                    ),
+                keyboardActions =
+                    KeyboardActions(
+                        onDone = {
+                            focusManager.clearFocus()
+                            viewModel.onEvent(LoginEvent.OnLoginClicked)
+                        },
+                    ),
+                enabled = state.loginState !is LoginState.Loading,
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -112,12 +117,12 @@ fun LoginScreen(
             Button(
                 onClick = { viewModel.onEvent(LoginEvent.OnLoginClicked) },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = state.loginState !is LoginState.Loading
+                enabled = state.loginState !is LoginState.Loading,
             ) {
                 if (state.loginState is LoginState.Loading) {
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.height(24.dp)
+                        modifier = Modifier.height(24.dp),
                     )
                 } else {
                     Text("Giris Yap")
@@ -129,7 +134,7 @@ fun LoginScreen(
                 Text(
                     text = (state.loginState as LoginState.Error).message,
                     color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
         }

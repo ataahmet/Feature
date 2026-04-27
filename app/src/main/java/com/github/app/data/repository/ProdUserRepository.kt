@@ -8,22 +8,24 @@ import com.github.app.domain.repository.UserRepository
 import io.reactivex.Single
 import javax.inject.Inject
 
-class ProdUserRepository @Inject constructor(
-    private val userLocalDataSource: UserLocalDataSource,
-    private val githubApi: GithubApi
-) : UserRepository {
-    override fun getUser(): Single<String> {
-        return userLocalDataSource.getUser()
-    }
+class ProdUserRepository
+    @Inject
+    constructor(
+        private val userLocalDataSource: UserLocalDataSource,
+        private val githubApi: GithubApi,
+    ) : UserRepository {
+        override fun getUser(): Single<String> {
+            return userLocalDataSource.getUser()
+        }
 
-    override fun getUserDetail(ownerName: String): Single<Owner> {
-        return githubApi.getUserDetail(ownerName).map {
-            userLocalDataSource.writeUserName(ownerName)
-            return@map it.mapToOwnerEntity()
+        override fun getUserDetail(ownerName: String): Single<Owner> {
+            return githubApi.getUserDetail(ownerName).map {
+                userLocalDataSource.writeUserName(ownerName)
+                return@map it.mapToOwnerEntity()
+            }
+        }
+
+        override fun getUserName(): String {
+            return userLocalDataSource.getUserName()
         }
     }
-
-    override fun getUserName(): String {
-        return userLocalDataSource.getUserName()
-    }
-}

@@ -25,7 +25,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 object ApiModule {
-
     @Singleton
     @Provides
     fun provideCache(application: Application) =
@@ -33,47 +32,59 @@ object ApiModule {
 
     @Singleton
     @Provides
-    fun provideRequestInterceptor(defaultBook: Book) = Interceptor { chain ->
-        val originalRequest = chain.request()
-        val url = originalRequest.url.newBuilder()
-            .build()
-        val request = originalRequest.newBuilder().url(url).build()
-        chain.proceed(request)
-    }
+    fun provideRequestInterceptor(defaultBook: Book) =
+        Interceptor { chain ->
+            val originalRequest = chain.request()
+            val url =
+                originalRequest.url.newBuilder()
+                    .build()
+            val request = originalRequest.newBuilder().url(url).build()
+            chain.proceed(request)
+        }
 
     @Singleton
     @Provides
-    fun provideHttpLoggingInterceptor() = HttpLoggingInterceptor().apply {
-        level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
-        else HttpLoggingInterceptor.Level.NONE
-    }
+    fun provideHttpLoggingInterceptor() =
+        HttpLoggingInterceptor().apply {
+            level =
+                if (BuildConfig.DEBUG) {
+                    HttpLoggingInterceptor.Level.BODY
+                } else {
+                    HttpLoggingInterceptor.Level.NONE
+                }
+        }
 
     @Singleton
     @Provides
     fun provideOkHttpClient(
         cache: Cache,
         requestInterceptor: Interceptor,
-        httpLoggingInterceptor: HttpLoggingInterceptor
-    ): OkHttpClient = OkHttpClient.Builder()
-        .cache(cache)
-        .addInterceptor(requestInterceptor)
-        .addInterceptor(httpLoggingInterceptor)
-        .addNetworkInterceptor(StethoInterceptor())
-        .connectTimeout(ApiPaths.TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
-        .readTimeout(ApiPaths.TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
-        .writeTimeout(ApiPaths.TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
-        .build()
+        httpLoggingInterceptor: HttpLoggingInterceptor,
+    ): OkHttpClient =
+        OkHttpClient.Builder()
+            .cache(cache)
+            .addInterceptor(requestInterceptor)
+            .addInterceptor(httpLoggingInterceptor)
+            .addNetworkInterceptor(StethoInterceptor())
+            .connectTimeout(ApiPaths.TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(ApiPaths.TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
+            .writeTimeout(ApiPaths.TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
+            .build()
 
     @Singleton
     @Provides
-    fun provideMoshi(): Moshi = Moshi.Builder()
-        .add(Wrapped.ADAPTER_FACTORY)
-        .add(DateAdapter())
-        .build()
+    fun provideMoshi(): Moshi =
+        Moshi.Builder()
+            .add(Wrapped.ADAPTER_FACTORY)
+            .add(DateAdapter())
+            .build()
 
     @Singleton
     @Provides
-    fun provideRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit =
+    fun provideRetrofit(
+        okHttpClient: OkHttpClient,
+        moshi: Moshi,
+    ): Retrofit =
         Retrofit.Builder()
             .baseUrl(ApiPaths.API_BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
@@ -83,7 +94,8 @@ object ApiModule {
 
     @Singleton
     @Provides
-    fun provideGithubApi(retrofit: Retrofit): GithubApi = retrofit.create(
-        GithubApi::class.java
-    )
+    fun provideGithubApi(retrofit: Retrofit): GithubApi =
+        retrofit.create(
+            GithubApi::class.java,
+        )
 }

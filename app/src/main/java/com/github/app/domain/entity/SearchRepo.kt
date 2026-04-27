@@ -8,5 +8,5 @@ data class SearchRepo(
     val id: Int,
     val repoName: String?,
     val owner: Owner?,
-    val forks: Int
+    val forks: Int,
 ) : Entity, Parcelable

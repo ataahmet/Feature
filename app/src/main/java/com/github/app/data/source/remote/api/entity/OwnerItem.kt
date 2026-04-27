@@ -6,5 +6,5 @@ import com.squareup.moshi.JsonClass
 data class OwnerItem(
     val `avatar_url`: String?,
     val `login`: String?,
-    val `blog`: String?
+    val `blog`: String?,
 ) : ApiEntity

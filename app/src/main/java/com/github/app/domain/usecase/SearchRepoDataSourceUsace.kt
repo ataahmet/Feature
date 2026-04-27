@@ -6,6 +6,8 @@ import io.reactivex.disposables.CompositeDisposable
 
 interface SearchRepoDataSourceUsace : UseCase {
     fun initSearchRepoUsacase(mCompositeDisposable: CompositeDisposable)
+
     fun userDetail(ownerName: String): Observable<Owner>
+
     fun userCache(): Observable<String>
 }
