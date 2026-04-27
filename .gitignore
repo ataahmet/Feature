@@ -12,3 +12,10 @@ local.properties
 # IML
 *.iml
 **/*.iml
+
+
+.ai-review/.env
+.ai-review/kb.faiss
+.ai-review/kb.meta.json
+.ai-review/venv/
+.ai-review/__pycache__/
