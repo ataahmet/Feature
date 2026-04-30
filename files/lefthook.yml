@@ -1,0 +1,9 @@
+# lefthook.yml — repo köküne koy
+# Kurulum: brew install lefthook && lefthook install
+
+pre-push:
+  parallel: false
+  commands:
+    ktlint_copilot:
+      glob: "*.kt"
+      run: bash scripts/copilot-ktlint-fix.sh
