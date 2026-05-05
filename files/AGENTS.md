@@ -1,178 +1,200 @@
-# AGENTS.md — Project Instructions for AI Coding Assistants
+# AGENTS.md
 
-> This file governs how AI tools interact with this codebase.
-> Read this entire file before writing any code.
+Bu dosya bu repo'da çalışan tüm AI ajanlar için bağlayıcı kuralları içerir.
+Spec dosyalarında bu kurallar tekrar edilmez; sadece referans verilir.
 
----
-
-## 0. FIRST RULE — Spec Before Code
-
-**Never write implementation code without a spec file.**
-
-Before starting any task, check if a spec exists:
-- Spec files live in `/specs/` folder
-- Named as `[feature-name]-spec.md`
-
-If no spec exists:
-1. Stop
-2. Tell the user: "No spec found for this feature. Please create one using the spec template at `/specs/_template.md` before I proceed."
-3. Wait for the spec to be provided
-
-If a spec exists:
-1. Read it fully before writing a single line
-2. Validate your output against it when done
+Spec'ler bu dosyadan sapmak zorunda kalırsa, sapma açıkça gerekçeli olarak
+spec'in "AGENTS.md'den Sapmalar" bölümünde belirtilir.
 
 ---
 
-## 1. Project Overview
+## Mimari
 
-- **Platform:** Android
-- **Language:** Kotlin
-- **UI Framework:** Jetpack Compose
-- **Min SDK:** (fill in)
-- **Target SDK:** (fill in)
+### Katmanlar (Clean Architecture)
 
----
+- `data/` — Repository implementasyonları, Retrofit API'leri, Room DAO'ları,
+  DataStore wrapper'ları, DTO'lar, mapper'lar
+- `domain/` — Repository interface'leri, UseCase'ler, domain modelleri.
+  Android SDK'ya bağımlılık YOK. Saf Kotlin.
+- `presentation/` — ViewModel'ler, Composable'lar, UI state'leri, navigation
 
-## 2. Architecture Rules
-
-### Pattern
-This project follows **MVVM + Clean Architecture**.
+### Bağımlılık Yönü
 
 ```
-ui/
-  screens/          ← Composables only, no business logic
-  components/       ← Reusable UI components
-  viewmodels/       ← State holders, no direct data access
-
-domain/
-  usecases/         ← One class, one responsibility
-  models/           ← Pure Kotlin data classes
-  repositories/     ← Interfaces only
-
-data/
-  repositories/     ← Implementations
-  remote/           ← API calls
-  local/            ← Room / DataStore
+presentation → domain ← data
 ```
 
-### Hard Rules
-- Composables never access repositories or data sources directly
-- ViewModels never import Android framework classes (Context, Activity)
-- Use cases do one thing only — no multi-purpose use cases
-- Data layer never knows about UI layer
+- Domain hiçbir katmana bağımlı değildir.
+- Data ve presentation katmanları domain'i bilir.
+- Data ve presentation birbirini doğrudan tanımaz.
+
+### Modül Yapısı
+
+- `:app` — Entry point, navigation graph, DI bootstrap
+- `:core:ui` — Tasarım sistemi, ortak Composable'lar, theme
+- `:core:network` — Retrofit, OkHttp, interceptor'lar, base config
+- `:core:database` — Room database, base entity'ler
+- `:core:common` — Result wrapper, extension'lar, ortak util'ler
+- `:feature:<ad>` — Her feature kendi modülünde, kendi data/domain/presentation
+  yapısıyla
 
 ---
 
-## 3. Code Style
+## Teknoloji Stack'i (Pazarlık Konusu Değil)
 
-### Kotlin
-- Prefer `data class` over plain classes for models
-- Use `sealed class` for UI state (Loading, Success, Error)
-- Prefer `StateFlow` over `LiveData`
-- No nullable types without explicit reason — document why
-- Use `when` exhaustively for sealed classes
-
-### Jetpack Compose
-- No business logic inside `@Composable` functions
-- Side effects only in `LaunchedEffect`, `DisposableEffect`
-- Preview annotations for every composable
-- State hoisting — composables receive state, don't hold it
-
-### Naming
-| Type | Convention | Example |
-|---|---|---|
-| Composable | PascalCase | `UserProfileScreen` |
-| ViewModel | PascalCase + ViewModel | `UserProfileViewModel` |
-| UseCase | PascalCase + UseCase | `GetUserProfileUseCase` |
-| Repository interface | PascalCase + Repository | `UserRepository` |
-| Flow/StateFlow | camelCase | `uiState`, `userList` |
+- Kotlin 2.0, Java 17 toolchain
+- Gradle Kotlin DSL (`build.gradle.kts`), Version Catalog (`libs.versions.toml`)
+- Compose UI — yeni ekranlarda XML kullanılmaz
+- Hilt — DI için tek seçim, Koin yasak
+- Coroutines + Flow — async için, RxJava yasak
+- Retrofit + OkHttp + Kotlinx Serialization — Gson yasak
+- Room — yerel DB için, raw SQLite yasak
+- DataStore Preferences — SharedPreferences yasak
+- Coil — image loading için, Glide/Picasso yasak
+- Timber — logging için, `Log.d` production'da yasak
+- minSdk 24, targetSdk 34, compileSdk 34
 
 ---
 
-## 4. Dependency Injection
+## State Yönetimi
 
-- Use **Hilt** for dependency injection
-- Every ViewModel injected via `@HiltViewModel`
-- No manual instantiation of repositories or use cases
-- Modules live in `di/` folder
-
----
-
-## 5. Security Rules
-
-- No API keys, secrets, or credentials in source code
-- Sensitive data stored in **EncryptedSharedPreferences**, not plain SharedPreferences
-- No personal data (name, email, phone) in logs or analytics events
-- All user inputs validated before processing
-- HTTPS only — no plain HTTP calls
+- ViewModel'lerde `StateFlow` kullanılır, `LiveData` yeni kodda yasak
+- UI state `sealed interface` ile modellenir:
+  ```kotlin
+  sealed interface LoginUiState {
+      data object Idle : LoginUiState
+      data object Loading : LoginUiState
+      data class Success(val user: User) : LoginUiState
+      data class Error(val message: String) : LoginUiState
+  }
+  ```
+- One-shot eventler için `Channel` + `receiveAsFlow()`
+- UI event'ler için `sealed interface` (örn. `NavigateTo`, `ShowSnackbar`)
 
 ---
 
-## 6. Firebase Analytics Rules
+## Hata Yönetimi
 
-- Never call Firebase directly from Composables or ViewModels
-- All analytics go through `AnalyticsService` interface
-- Event names defined in `AnalyticsEvents.kt` constants file — no hardcoded strings
-- No PII in event parameters
-
-```kotlin
-// ❌ Wrong
-FirebaseAnalytics.getInstance(context).logEvent("button_click", null)
-
-// ✅ Correct
-analyticsService.logEvent(AnalyticsEvents.BUTTON_CLICK)
-```
-
----
-
-## 7. Error Handling
-
-- Every network call wrapped in `Result<T>` or `sealed class`
-- No silent failures — every error must be handled or explicitly ignored with a comment
-- User-facing errors shown via UI state, never via raw exception messages
-- No empty `catch` blocks
-
-```kotlin
-// ❌ Wrong
-try { ... } catch (e: Exception) { }
-
-// ✅ Correct
-try { ... } catch (e: Exception) {
-    _uiState.value = UiState.Error(e.toUserMessage())
-}
-```
+- Repository'ler `Result<T>` döndürür (Kotlin's built-in), exception fırlatmaz
+- Domain katmanında özel exception sınıfları:
+  ```kotlin
+  sealed class DomainException(message: String) : Exception(message) {
+      data object NetworkUnavailable : DomainException("No network")
+      data class ServerError(val code: Int) : DomainException("Server $code")
+      data object Unauthorized : DomainException("Unauthorized")
+  }
+  ```
+- UI'da kullanıcıya gösterilecek hata mesajları `strings.xml` üzerinden
+- Try-catch sadece sınır katmanlarında (Repository implementasyonları)
 
 ---
 
-## 8. Testing Requirements
+## Kod Stili
 
-- ViewModels must have unit tests
-- Use cases must have unit tests
-- Repository implementations must have unit tests
-- Use `kotlinx-coroutines-test` for coroutine testing
-- No test should depend on Android framework — use fakes/mocks
-
----
-
-## 9. Review Checklist
-
-Before marking any task as complete, verify:
-
-- [ ] Spec exists and output matches it
-- [ ] Architecture rules followed (no layer violations)
-- [ ] No hardcoded strings, credentials, or magic numbers
-- [ ] Error states handled
-- [ ] No personal data in logs or analytics
-- [ ] No compiler warnings introduced
-- [ ] Naming conventions followed
+- Public API'lerde KDoc zorunlu, internal'larda önerilir
+- Function uzunluğu max 40 satır (gerekçesiz aşılmaz)
+- Sınıf uzunluğu max 300 satır (gerekçesiz aşılmaz)
+- `!!` operatörü YASAK — null-safety açıkça ele alınır
+- `runBlocking` test dışında YASAK
+- Magic number yok — `private const val` ile isimlendirilir
+- `companion object` sadece factory ve sabitler için
+- ktlint ve detekt CI'da pass etmek zorunda
 
 ---
 
-## 10. What NOT to Do
+## Test
 
-- Do not refactor code outside the scope of the current spec
-- Do not add dependencies not mentioned in the spec
-- Do not change existing interfaces without updating the spec first
-- Do not generate boilerplate "just in case" — only what the spec requires
-- Do not assume missing spec details — ask instead
+### Stack
+
+- Unit test: JUnit 5, MockK, Turbine, Truth (veya Kotest)
+- UI test: Compose UI Test, Espresso (legacy)
+- Coroutine test: `StandardTestDispatcher`, `runTest`
+- Hilt test: `@HiltAndroidTest`, `HiltTestRunner`
+
+### Kurallar
+
+- Coverage hedefi: domain %80+, presentation %60+, data %50+
+- Mock yerine **fake** tercih edilir (özellikle Repository ve DataSource için)
+- Her ViewModel için minimum: happy path + error path + edge case testi
+- Test isimleri: `` `should X when Y` `` formatında
+- Test dosyaları kaynak dosyayla aynı paket yapısında
+
+---
+
+## Naming
+
+- Composable'lar: PascalCase, fiil yerine isim
+  - ✓ `LoginScreen`, `UserCard`, `OrderList`
+  - ✗ `ShowLogin`, `RenderUser`
+- ViewModel'ler: `<Ekran>ViewModel` (`LoginViewModel`, `HomeViewModel`)
+- UseCase'ler: `<Eylem>UseCase` (`LoginUseCase`, `FetchUsersUseCase`)
+- Repository: interface `<Domain>Repository`, impl `<Domain>RepositoryImpl`
+- DTO'lar: `<Ad>Dto` (`UserDto`, `LoginResponseDto`)
+- Mapper'lar: `<Ad>Mapper` veya extension `toDomain()` / `toDto()`
+- Hilt module'ler: `<Sorumluluk>Module` (`NetworkModule`, `DatabaseModule`)
+
+---
+
+## Yasaklar
+
+- `GlobalScope.launch` kullanılmaz
+- `Activity.runOnUiThread` kullanılmaz (Compose'da gerek yok)
+- Hardcoded string yok — `strings.xml` kullanılır
+- `Log.d`, `Log.e` production'da yasak — Timber kullanılır
+- `findViewById` ve View Binding yeni kodda yasak (Compose tercih)
+- `lateinit var` Composable'larda ve ViewModel'lerde yasak
+- Reflection production kodunda yasak (test'te serbest)
+- `Thread.sleep` yasak — `delay` kullanılır
+
+---
+
+## CI / Build
+
+- PR açılmadan önce lokal pass etmeli:
+  ```bash
+  ./gradlew check
+  ./gradlew :app:lintDebug
+  ./gradlew :app:detekt
+  ```
+- Commit mesajı: Conventional Commits
+  - `feat:` yeni özellik
+  - `fix:` bug düzeltme
+  - `refactor:` davranış değişmeden yeniden yapılanma
+  - `test:` test ekleme/güncelleme
+  - `chore:` build, ci, doc
+- Branch isimleri:
+  - `feature/<numara>-<kısa-ad>`
+  - `bugfix/<numara>-<kısa-ad>`
+  - `refactor/<numara>-<kısa-ad>`
+  - `test/<numara>-<kısa-ad>`
+
+---
+
+## Spec'lerle İlişki
+
+Tüm yeni iş `specs/` altında bir spec dosyasıyla başlar. Spec tipleri:
+
+- `specs/features/` — yeni özellikler
+- `specs/bugs/` — hata düzeltmeleri
+- `specs/tests/` — test coverage çalışmaları
+- `specs/refactors/` — davranış değişmeden kod yeniden yapılanması
+
+### Her Spec'in Kuralları
+
+1. Bu AGENTS.md'deki kurallar tekrar edilmez, sadece referans verilir
+2. Spec şablonu `specs/_templates/` altındadır
+3. Implementation task'lara bölünür, her task ayrı commit olur
+4. AGENTS.md'den sapma varsa açıkça "AGENTS.md'den Sapmalar" bölümünde
+   gerekçesiyle belirtilir
+5. Spec yazılmadan kod yazılmaz — istisna: 1 saatten kısa cleanup'lar
+
+---
+
+## AGENTS.md Değişiklikleri
+
+Bu dosya değiştirildiğinde:
+
+- Commit mesajı: `chore(agents): <kısa açıklama>`
+- PR açılır, takım review eder
+- Mevcut spec'ler etkileniyorsa migrate path belirtilir
+- Sprint retrospektifinde haftada bir bu dosya hızlıca okunur

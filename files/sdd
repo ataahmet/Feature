@@ -1,0 +1,371 @@
+#!/usr/bin/env bash
+#
+# sdd — Specification-Driven Development helper
+# Copilot CLI ile çalışan ana dispatcher script.
+#
+# Kullanım:
+#   ./scripts/sdd new <feature|bug|test|refactor> "<kısa-ad>"
+#   ./scripts/sdd align <spec-yolu>
+#   ./scripts/sdd implement <spec-yolu> <task-id>
+#   ./scripts/sdd verify <spec-yolu>
+#   ./scripts/sdd list [feature|bug|test|refactor]
+
+set -euo pipefail
+
+# ----------------------------------------------------------------------------
+# Sabitler
+# ----------------------------------------------------------------------------
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+SPECS_DIR="${REPO_ROOT}/specs"
+TEMPLATES_DIR="${SPECS_DIR}/_templates"
+AGENTS_FILE="${REPO_ROOT}/AGENTS.md"
+
+# Renkler
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# ----------------------------------------------------------------------------
+# Yardımcılar
+# ----------------------------------------------------------------------------
+
+err() { echo -e "${RED}ERROR:${NC} $*" >&2; exit 1; }
+info() { echo -e "${BLUE}→${NC} $*"; }
+ok() { echo -e "${GREEN}✓${NC} $*"; }
+warn() { echo -e "${YELLOW}!${NC} $*"; }
+
+ensure_command() {
+  command -v "$1" >/dev/null 2>&1 || err "$1 bulunamadı, lütfen kur."
+}
+
+ensure_repo() {
+  [ -d "${REPO_ROOT}/.git" ] || err "Bu komut bir git repo'sunda çalıştırılmalı."
+  [ -f "${AGENTS_FILE}" ] || err "AGENTS.md bulunamadı. Önce kurulum yap."
+  [ -d "${TEMPLATES_DIR}" ] || err "specs/_templates/ bulunamadı."
+}
+
+next_number() {
+  local kind="$1"
+  local dir="${SPECS_DIR}/${kind}s"
+  mkdir -p "${dir}"
+
+  local max=0
+  for d in "${dir}"/*/; do
+    [ -d "$d" ] || continue
+    local name
+    name="$(basename "$d")"
+    local num="${name%%-*}"
+    if [[ "$num" =~ ^[0-9]+$ ]]; then
+      num=$((10#$num))
+      [ "$num" -gt "$max" ] && max="$num"
+    fi
+  done
+
+  printf "%03d" "$((max + 1))"
+}
+
+slugify() {
+  echo "$1" | tr '[:upper:]' '[:lower:]' \
+    | sed -E 's/[^a-z0-9]+/-/g' \
+    | sed -E 's/^-+|-+$//g'
+}
+
+# ----------------------------------------------------------------------------
+# Komutlar
+# ----------------------------------------------------------------------------
+
+cmd_new() {
+  local kind="${1:-}"
+  local name="${2:-}"
+
+  [ -z "$kind" ] && err "Kullanım: sdd new <feature|bug|test|refactor> \"<ad>\""
+  [ -z "$name" ] && err "Spec adı gerekli."
+
+  case "$kind" in
+    feature|bug|test|refactor) ;;
+    *) err "Geçersiz tip: $kind (feature|bug|test|refactor olmalı)" ;;
+  esac
+
+  local template="${TEMPLATES_DIR}/${kind}.md"
+  [ -f "$template" ] || err "Şablon bulunamadı: $template"
+
+  local slug
+  slug="$(slugify "$name")"
+  local num
+  num="$(next_number "$kind")"
+  local spec_dir="${SPECS_DIR}/${kind}s/${num}-${slug}"
+  local spec_file="${spec_dir}/spec.md"
+
+  [ -e "$spec_dir" ] && err "Spec zaten var: $spec_dir"
+
+  mkdir -p "$spec_dir"
+  cp "$template" "$spec_file"
+
+  # Branch prefix mapping
+  local branch_prefix="$kind"
+  [ "$kind" = "bug" ] && branch_prefix="bugfix"
+
+  local branch="${branch_prefix}/${num}-${slug}"
+
+  # Şablonun başındaki branch satırını güncelle
+  if command -v gsed >/dev/null 2>&1; then
+    gsed -i "s|<numara>-<ad>|${num}-${slug}|g" "$spec_file"
+  else
+    sed -i.bak "s|<numara>-<ad>|${num}-${slug}|g" "$spec_file" && rm -f "${spec_file}.bak"
+  fi
+
+  # Tarih
+  local today
+  today="$(date +%Y-%m-%d)"
+  if command -v gsed >/dev/null 2>&1; then
+    gsed -i "s|YYYY-MM-DD|${today}|g" "$spec_file"
+  else
+    sed -i.bak "s|YYYY-MM-DD|${today}|g" "$spec_file" && rm -f "${spec_file}.bak"
+  fi
+
+  ok "Spec oluşturuldu: ${spec_file}"
+  info "Branch oluşturuluyor: ${branch}"
+
+  # Mevcut branch'ten yeni branch oluştur
+  if git rev-parse --verify "$branch" >/dev/null 2>&1; then
+    warn "Branch zaten var: $branch — checkout yapılıyor."
+    git checkout "$branch"
+  else
+    git checkout -b "$branch"
+  fi
+
+  ok "Hazır. Spec'i editörde aç ve doldur:"
+  echo "    \$EDITOR ${spec_file}"
+  echo
+  info "Sonraki adım: alignment soruları üretmek için:"
+  echo "    ./scripts/sdd align ${spec_file}"
+}
+
+cmd_align() {
+  local spec_file="${1:-}"
+  [ -z "$spec_file" ] && err "Kullanım: sdd align <spec-yolu>"
+  [ -f "$spec_file" ] || err "Spec bulunamadı: $spec_file"
+
+  ensure_command gh
+
+  info "Alignment soruları üretiliyor..."
+  echo
+
+  local prompt
+  prompt=$(cat <<EOF
+Aşağıdaki spec dosyasını oku. Bu bir Android projesi için Specification-Driven
+Development spec'i. Proje kökündeki AGENTS.md dosyasındaki kurallara uyum
+zorunludur.
+
+Görevin: Spec'in 'Açık Kararlar (Alignment)' bölümünü doldurmak için
+8-12 numaralı clarifying soru üret. Her soruya en olası varsayılan cevabı
+[default: ...] formatında ekle.
+
+Sorular şu konuları kapsasın:
+- Veri akışı ve state yönetimi detayları
+- Edge case'ler (boş veri, network hatası, vb.)
+- UI/UX kararları (loading state, error state, empty state)
+- Persistence stratejisi
+- Bağımlılık ve modül kararları
+- Test stratejisi spesifik detayları
+
+Sorular numaralı liste halinde olsun, kullanıcı sadece "1, 2, 4 default,
+3 hayır şöyle olsun" diyerek kolayca cevaplayabilsin.
+
+Spec içeriği:
+---
+$(cat "$spec_file")
+---
+
+AGENTS.md özeti:
+---
+$(head -100 "$AGENTS_FILE")
+---
+EOF
+)
+
+  echo "$prompt" | gh copilot suggest -t shell <<< "$prompt" || \
+    gh copilot explain "$prompt"
+
+  echo
+  ok "Soruları yukarıdaki çıktıdan al, spec dosyasının 'Açık Kararlar' bölümüne yapıştır."
+  info "Sonra cevapları doldurup commit'le:"
+  echo "    git add ${spec_file}"
+  echo "    git commit -m \"docs(spec): align $(basename "$(dirname "$spec_file")")\""
+}
+
+cmd_implement() {
+  local spec_file="${1:-}"
+  local task_id="${2:-}"
+
+  [ -z "$spec_file" ] && err "Kullanım: sdd implement <spec-yolu> <task-id>"
+  [ -z "$task_id" ] && err "Task ID gerekli (örn. T1, T2)"
+  [ -f "$spec_file" ] || err "Spec bulunamadı: $spec_file"
+
+  ensure_command gh
+
+  info "Task ${task_id} implement ediliyor..."
+  echo
+
+  local prompt
+  prompt=$(cat <<EOF
+Aşağıdaki spec dosyasındaki ${task_id} task'ını implement et.
+Sadece o task'ı yap, diğer task'lara dokunma.
+
+Kurallar:
+1. Proje kökündeki AGENTS.md kurallarına mutlak uy.
+2. Spec'teki 'Açık Kararlar' bölümünde verilen cevaplara göre hareket et.
+3. Spec'teki 'Etkilenen Dosyalar' bölümündeki yollara uy.
+4. Yeni dosya oluştururken doğru paket yapısını kullan.
+5. Sadece ${task_id} kapsamında olan değişiklikleri yap.
+6. Implementation bitince spec dosyasındaki ${task_id} satırını [x] olarak işaretle.
+
+Spec dosyası:
+---
+$(cat "$spec_file")
+---
+
+AGENTS.md (kuralları hatırla):
+---
+$(cat "$AGENTS_FILE")
+---
+EOF
+)
+
+  gh copilot suggest "$prompt"
+
+  echo
+  info "Çıktıyı incele, manuel olarak uygula veya doğrudan editöründe kabul et."
+  warn "Implementation bittikten sonra:"
+  echo "    1. ./gradlew check"
+  echo "    2. Spec dosyasında ${task_id}'yi [x] olarak işaretle"
+  echo "    3. git add . && git commit -m \"<tip>(<scope>): ${task_id} <açıklama>\""
+}
+
+cmd_verify() {
+  local spec_file="${1:-}"
+  [ -z "$spec_file" ] && err "Kullanım: sdd verify <spec-yolu>"
+  [ -f "$spec_file" ] || err "Spec bulunamadı: $spec_file"
+
+  ensure_command gh
+
+  info "Spec doğrulanıyor..."
+  echo
+
+  local prompt
+  prompt=$(cat <<EOF
+Aşağıdaki spec dosyasını AGENTS.md ile karşılaştır.
+Şu kontrolleri yap:
+
+1. Spec AGENTS.md kurallarıyla çelişiyor mu?
+2. 'AGENTS.md'den Sapmalar' bölümü doldurulmuş mu? Sapmalar gerekçeli mi?
+3. Tasks listesi tutarlı mı? (data → domain → presentation sırası)
+4. Kabul kriterleri test edilebilir mi?
+5. Kapsam Dışı bölümü açık mı?
+6. Eksik veya belirsiz bölümler var mı?
+
+Bulduğun her sorunu kategorize et:
+- KRİTİK: spec'in implement edilmesini engeller
+- UYARI: implementation kalitesini düşürür
+- ÖNERİ: iyileştirme fırsatı
+
+Spec:
+---
+$(cat "$spec_file")
+---
+
+AGENTS.md:
+---
+$(cat "$AGENTS_FILE")
+---
+EOF
+)
+
+  gh copilot explain "$prompt"
+}
+
+cmd_list() {
+  local kind="${1:-all}"
+
+  if [ "$kind" = "all" ]; then
+    for k in feature bug test refactor; do
+      cmd_list "$k"
+    done
+    return
+  fi
+
+  local dir="${SPECS_DIR}/${kind}s"
+  [ -d "$dir" ] || { warn "Klasör yok: $dir"; return; }
+
+  echo
+  echo -e "${BLUE}=== ${kind^^}S ===${NC}"
+
+  local found=0
+  for d in "${dir}"/*/; do
+    [ -d "$d" ] || continue
+    found=1
+    local name
+    name="$(basename "$d")"
+    local spec="${d}spec.md"
+    local status="unknown"
+    if [ -f "$spec" ]; then
+      status="$(grep -E '^\*\*Durum:\*\*' "$spec" | head -1 | sed 's/.*: //' | tr -d '*')"
+    fi
+    printf "  %-40s  %s\n" "$name" "$status"
+  done
+
+  [ "$found" = "0" ] && echo "  (boş)"
+}
+
+cmd_help() {
+  cat <<EOF
+sdd — Specification-Driven Development helper
+
+KOMUTLAR:
+
+  new <tip> "<ad>"          Yeni spec oluştur (feature|bug|test|refactor)
+  align <spec-yolu>          Alignment soruları üret (Copilot CLI ile)
+  implement <spec> <T-ID>    Belirli task'ı implement et (Copilot CLI ile)
+  verify <spec-yolu>         Spec'i AGENTS.md ile karşılaştır
+  list [tip]                 Mevcut spec'leri listele
+  help                       Bu yardım mesajı
+
+ÖRNEKLER:
+
+  ./scripts/sdd new feature "Kullanıcı Girişi"
+  ./scripts/sdd align specs/features/001-kullanici-girisi/spec.md
+  ./scripts/sdd implement specs/features/001-kullanici-girisi/spec.md T3
+  ./scripts/sdd verify specs/features/001-kullanici-girisi/spec.md
+  ./scripts/sdd list feature
+
+GEREKSİNİMLER:
+  - git
+  - gh (GitHub CLI) + gh-copilot extension
+    Kurulum: gh extension install github/gh-copilot
+
+EOF
+}
+
+# ----------------------------------------------------------------------------
+# Main dispatcher
+# ----------------------------------------------------------------------------
+
+main() {
+  local cmd="${1:-help}"
+  shift || true
+
+  case "$cmd" in
+    new)        ensure_repo; cmd_new "$@" ;;
+    align)      ensure_repo; cmd_align "$@" ;;
+    implement)  ensure_repo; cmd_implement "$@" ;;
+    verify)     ensure_repo; cmd_verify "$@" ;;
+    list)       ensure_repo; cmd_list "$@" ;;
+    help|-h|--help) cmd_help ;;
+    *) err "Bilinmeyen komut: $cmd. './sdd help' ile yardım al." ;;
+  esac
+}
+
+main "$@"
